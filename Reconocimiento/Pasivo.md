@@ -1,57 +1,95 @@
-# 🛡️ Offensive Security: Reconocimiento Pasivo
+<div align="center">
 
-> Bienvenido a la sección de **Reconocimiento Pasivo**. Esta fase es crítica y se enfoca en recolectar la mayor cantidad de información posible sobre el objetivo **sin interactuar directamente** con sus sistemas principales, evadiendo así la detección temprana por parte de los Blue Teams (IDS/IPS/SIEM).
+# 🛡️ Offensive Security
+### Passive Reconnaissance
 
----
+![Status](https://img.shields.io/badge/Status-Active-00d4ff?style=for-the-badge&logo=statuspage&logoColor=white)
+![Category](https://img.shields.io/badge/Category-Passive%20Recon-00ff88?style=for-the-badge&logo=hackthebox&logoColor=white)
+![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows-ff3c6e?style=for-the-badge&logo=linux&logoColor=white)
 
-> ⚠️ **Aviso Legal y Ético:** Todas las herramientas y comandos documentados en este repositorio deben ser utilizados única y exclusivamente en entornos donde poseas **autorización explícita por escrito** (Reglas de Enfrentamiento / RoE).
-
----
-
-## 📋 Resumen de Herramientas
-
-| Herramienta  | Categoría Principal       | Enfoque                                                  |
-|--------------|---------------------------|----------------------------------------------------------|
-| DNSRecon     | Enumeración DNS            | Multipropósito (Registros, AXFR, Brute-force)            |
-| Amass        | OSINT / Descubrimiento     | Mapeo profundo de activos y subdominios                  |
-| Subfinder    | OSINT / Descubrimiento     | Alta velocidad, fuentes pasivas múltiples                |
-| dnsx         | Resolución Masiva          | Filtrado, verificación y enrutamiento DNS rápido         |
-| BBOT         | OSINT / Automatización     | Enumeración modular con agregación de ASNs               |
-| massdns      | DNS Brute-Force            | Resolución masiva de alta velocidad                      |
-| shuffledns   | DNS Brute-Force            | Wrapper de massdns con soporte wildcard                  |
-| ffuf         | Virtual Hosts / CORS       | Fuzzing de Host headers y detección de VHosts            |
-| PowerShell   | Nativo (Windows)           | Consultas Living off the Land (LotL)                     |
+</div>
 
 ---
 
+> **¿Qué es el Reconocimiento Pasivo?**
+> Esta fase se enfoca en recolectar la mayor cantidad de información posible sobre el objetivo **sin interactuar directamente** con sus sistemas principales, evadiendo la detección temprana por parte de los Blue Teams (IDS/IPS/SIEM).
 
-### 1. DNSRecon: La Navaja Suiza del DNS
+> [!WARNING]
+> **Aviso Legal y Ético:** Todas las herramientas y comandos documentados en este repositorio deben ser utilizados única y exclusivamente en entornos donde se posea **autorización explícita por escrito (Reglas de Enfrentamiento / RoE).**
+
+---
+
+## 📑 Tabla de Contenidos
+
+| # | Sección |
+|---|---------|
+| 01 | [🗂️ Resumen de Herramientas](#️-resumen-de-herramientas) |
+| 02 | [🔬 DNSRecon](#-dnsrecon--la-navaja-suiza-del-dns) |
+| 03 | [🌐 OWASP Amass](#-owasp-amass--inteligencia-de-activos) |
+| 04 | [⚡ Subfinder & Sublist3r](#-subfinder--sublist3r) |
+| 05 | [🔀 dnsx](#-dnsx--resolución-masiva-y-filtrado) |
+| 06 | [💻 PowerShell / LotL](#-powershell--living-off-the-land) |
+| 07 | [🗺️ ASNs](#️-asns--mapeo-de-rangos-ip) |
+| 08 | [🔍 Descubrimiento de Dominios](#-descubrimiento-de-dominios) |
+| 09 | [🗂️ Descubrimiento de Subdominios](#️-descubrimiento-de-subdominios) |
+| 10 | [🖥️ Virtual Hosts (VHosts)](#️-virtual-hosts-vhosts) |
+| 11 | [🔑 Credenciales & Secretos](#-credenciales--secretos-filtrados) |
+| 12 | [☁️ Cloud Assets](#️-cloud-assets-públicos) |
+| 13 | [📊 Recapitulación](#-recapitulación-del-proceso) |
+
+---
+
+## 🗂️ Resumen de Herramientas
+
+| Herramienta | Categoría | Enfoque | Badge |
+|-------------|-----------|---------|-------|
+| **DNSRecon** | Enumeración DNS | Registros, AXFR, Brute-force, DNSSEC walk | ![](https://img.shields.io/badge/-DNS-00d4ff?style=flat-square) |
+| **OWASP Amass** | OSINT / Descubrimiento | Mapeo profundo de activos, subdominios y ASNs | ![](https://img.shields.io/badge/-OSINT-00ff88?style=flat-square) |
+| **Subfinder** | OSINT / Descubrimiento | Alta velocidad, fuentes pasivas múltiples | ![](https://img.shields.io/badge/-OSINT-00ff88?style=flat-square) |
+| **dnsx** | Resolución Masiva | Filtrado, verificación y enrutamiento DNS rápido | ![](https://img.shields.io/badge/-DNS-00d4ff?style=flat-square) |
+| **BBOT** | OSINT / Automatización | Enumeración modular con agregación de ASNs | ![](https://img.shields.io/badge/-AUTO-ffb300?style=flat-square) |
+| **massdns** | DNS Brute-Force | Resolución masiva de alta velocidad | ![](https://img.shields.io/badge/-BRUTE-ff3c6e?style=flat-square) |
+| **shuffledns** | DNS Brute-Force | Wrapper de massdns con soporte wildcard | ![](https://img.shields.io/badge/-BRUTE-ff3c6e?style=flat-square) |
+| **ffuf** | Virtual Hosts / CORS | Fuzzing de Host headers y detección de VHosts | ![](https://img.shields.io/badge/-FUZZ-a855f7?style=flat-square) |
+| **PowerShell** | Nativo Windows | Living off the Land para internal recon | ![](https://img.shields.io/badge/-LotL-5865f2?style=flat-square) |
+
+---
+
+## 🔬 DNSRecon — La Navaja Suiza del DNS
+
+![Tool](https://img.shields.io/badge/Tool-DNSRecon-00d4ff?style=flat-square&logo=python&logoColor=white)
+![Lang](https://img.shields.io/badge/Language-Python-3776ab?style=flat-square&logo=python&logoColor=white)
 
 Herramienta escrita en Python, indispensable para la enumeración de registros, transferencias de zona y recolección de información del espacio de nombres.
 
-#### Enumeración Estándar (Registros SRV, SOA, NS, MX, A, AAAA)
+### `[01]` Enumeración Estándar
+
+Registros SRV, SOA, NS, MX, A, AAAA del dominio objetivo.
 
 ```bash
 dnsrecon -d example.com
 ```
 
-#### Intento de Transferencia de Zona (AXFR)
+### `[02]` Transferencia de Zona (AXFR)
 
-Solicita una copia completa de la zona DNS. Si está mal configurado, revelará **toda la infraestructura**.
+> [!IMPORTANT]
+> Si está mal configurado, revelará **toda la infraestructura** del objetivo. Siempre reportar si es vulnerable.
 
 ```bash
 dnsrecon -d example.com -t axfr
 ```
 
-#### Fuerza Bruta de Subdominios
+### `[03]` Fuerza Bruta de Subdominios
 
-Utiliza un diccionario personalizado para descubrir hosts no listados públicamente.
+Diccionario personalizado para descubrir hosts no listados públicamente.
 
 ```bash
-dnsrecon -d example.com -D /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -t brt
+dnsrecon -d example.com \
+  -D /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt \
+  -t brt
 ```
 
-#### Búsqueda Inversa por Rango (Reverse Lookup)
+### `[04]` Búsqueda Inversa por Rango (Reverse Lookup)
 
 Mapea un bloque CIDR para ver qué dominios resuelven a esas IPs.
 
@@ -59,15 +97,15 @@ Mapea un bloque CIDR para ver qué dominios resuelven a esas IPs.
 dnsrecon -r 192.168.1.0/24
 ```
 
-#### Expansión de TLD (Top Level Domain)
+### `[05]` Expansión de TLD
 
-Busca el mismo nombre de dominio a través de diferentes terminaciones geográficas o comerciales (ej. `.net`, `.org`, `.co.uk`).
+Busca el mismo dominio a través de diferentes terminaciones (`.net`, `.org`, `.co.uk`).
 
 ```bash
 dnsrecon -d example -t tld
 ```
 
-#### Caminata de Zona DNSSEC (Zone Walk)
+### `[06]` Caminata de Zona DNSSEC (Zone Walk)
 
 Extrae registros de una zona asegurada con DNSSEC explotando registros NSEC.
 
@@ -75,9 +113,9 @@ Extrae registros de una zona asegurada con DNSSEC explotando registros NSEC.
 dnsrecon -d example.com -z
 ```
 
-#### Salida Estructurada (JSON/SQLite)
+### `[07]` Salida Estructurada JSON
 
-Ideal para integrar los resultados en otras herramientas automatizadas o bases de datos.
+Ideal para integrar resultados en pipelines automatizados o bases de datos.
 
 ```bash
 dnsrecon -d example.com -j resultados_dnsrecon.json
@@ -85,117 +123,29 @@ dnsrecon -d example.com -j resultados_dnsrecon.json
 
 ---
 
-### 2. OWASP Amass: Inteligencia de Activos Profunda
+## 🌐 OWASP Amass — Inteligencia de Activos
 
-Amass es el rey del descubrimiento pasivo profundo. Utiliza técnicas de scraping, APIs y bases de datos WHOIS históricas.
+![Tool](https://img.shields.io/badge/Tool-Amass-00ff88?style=flat-square&logo=owasp&logoColor=white)
 
-#### Descubrimiento Pasivo Total
+El rey del descubrimiento pasivo profundo. Utiliza técnicas de scraping, APIs y bases de datos WHOIS históricas.
 
-Busca subdominios utilizando todas las fuentes pasivas disponibles **sin enviar tráfico al objetivo**.
+### `[01]` Descubrimiento Pasivo Total
+
+Busca subdominios usando todas las fuentes pasivas disponibles **sin enviar tráfico al objetivo**.
 
 ```bash
 amass enum -passive -d example.com
 ```
 
-#### Inteligencia Inversa (WHOIS)
+### `[02]` Inteligencia Inversa (WHOIS)
 
-Encuentra otros dominios raíz que pertenezcan a la misma organización basándose en los datos de registro.
+Encuentra dominios raíz adicionales que pertenezcan a la misma organización.
 
 ```bash
 amass intel -d example.com -whois
 ```
 
-#### Descubrimiento de ASN (Autonomous System Number)
-
-Identifica el bloque de red y el ISP que aloja la infraestructura del objetivo.
-
-```bash
-amass intel -org "Nombre de la Empresa"
-```
-
----
-
-### 3. Subfinder & Sublist3r: Velocidad y Multi-motor
-
-Herramientas diseñadas para consultar decenas de motores de búsqueda, repositorios de GitHub y bases de datos públicas en segundos.
-
-#### Ejecución Silenciosa y Limpia (Subfinder)
-
-Extrae subdominios y muestra únicamente los resultados, ideal para encadenar comandos (Piping).
-
-```bash
-subfinder -d example.com -silent
-```
-
-#### Consultas a Motores Específicos (Sublist3r)
-
-Limita la búsqueda a motores particulares y aumenta los hilos para mayor velocidad.
-
-```bash
-sublist3r -d example.com -e google,yahoo,virustotal -t 10
-```
-
----
-
-### 4. dnsx: Resolución Masiva y Filtrado
-
-Desarrollada por [ProjectDiscovery](https://github.com/projectdiscovery/dnsx), `dnsx` es un toolkit DNS rápido y multipropósito diseñado para manejar listas inmensas de subdominios.
-
-#### Verificación de Subdominios Vivos
-
-Toma una lista de subdominios descubiertos pasivamente y verifica cuáles resuelven actualmente a una IP.
-
-```bash
-cat subdominios_crudos.txt | dnsx -a -resp
-```
-
-#### Extracción de CNAME (Subdomain Takeover Recon)
-
-Identifica registros CNAME apuntando a servicios de terceros (AWS, GitHub Pages, Azure) que podrían ser vulnerables a **secuestro de subdominio**.
-
-```bash
-cat subdominios_crudos.txt | dnsx -cname -resp
-```
-
----
-
-### 5. Técnicas Nativas (PowerShell / Living off the Land)
-
-Para pentesting en entornos Windows (**Assumed Breach / Internal Recon**) donde no puedes instalar herramientas de terceros.
-
-#### Enumeración de Servicios Internos (SRV)
-
-Descubre controladores de dominio, servidores de catálogo global o servicios LDAP.
-
-```powershell
-Resolve-DnsName -Name _ldap._tcp.dc._msdcs.dominio.local -Type SRV
-```
-
-#### Resolución Básica y MX
-
-```powershell
-Resolve-DnsName -Name example.com -Type MX
-```
-
----
-
-## 🌐 ASNs: Mapeo de Rangos IP de la Organización
-
-Un **Autonomous System Number (ASN)** es un identificador único asignado por la IANA a un sistema autónomo que administra bloques de IPs con una política de enrutamiento definida. Identificar los ASNs del objetivo permite mapear toda su superficie de red.
-
-### Recursos Online para búsqueda de ASNs
-
-| Plataforma | URL | Notas |
-|------------|-----|-------|
-| Hurricane Electric BGP | https://bgp.he.net/ | Completo, con Whois e IP ranges |
-| BGPView | https://bgpview.io/ | API gratuita disponible |
-| IPInfo | https://ipinfo.io/ | Información de ASN por IP |
-| ASN Lookup | http://asnlookup.com/ | API gratuita |
-| IPv4Info | http://ipv4info.com/ | IP y ASN por dominio |
-
-> **Registros regionales:** AFRINIC (África), ARIN (América del Norte), APNIC (Asia), LACNIC (América Latina), RIPE NCC (Europa).
-
-### Búsqueda con Amass
+### `[03]` Descubrimiento de ASN
 
 ```bash
 # Por nombre de organización
@@ -205,20 +155,109 @@ amass intel -org tesla
 amass intel -asn 8911,50313,394161
 ```
 
-### Enumeración Automática con BBOT
+---
 
-BBOT agrega y resume ASNs automáticamente al final del escaneo:
+## ⚡ Subfinder & Sublist3r
+
+![Tool](https://img.shields.io/badge/Tool-Subfinder-00ff88?style=flat-square&logo=go&logoColor=white)
+![Tool](https://img.shields.io/badge/Tool-Sublist3r-00ff88?style=flat-square&logo=python&logoColor=white)
+
+Herramientas diseñadas para consultar decenas de motores de búsqueda y bases de datos públicas en segundos.
+
+### `[01]` Ejecución Silenciosa — Subfinder
+
+Extrae subdominios mostrando únicamente los resultados. Ideal para encadenar con otros comandos (piping).
+
+```bash
+subfinder -d example.com -silent
+```
+
+### `[02]` Motores Específicos — Sublist3r
+
+```bash
+sublist3r -d example.com -e google,yahoo,virustotal -t 10
+```
+
+---
+
+## 🔀 dnsx — Resolución Masiva y Filtrado
+
+![Tool](https://img.shields.io/badge/Tool-dnsx-00d4ff?style=flat-square&logo=go&logoColor=white)
+![Author](https://img.shields.io/badge/By-ProjectDiscovery-ff3c6e?style=flat-square)
+
+Toolkit DNS rápido y multipropósito diseñado para manejar listas inmensas de subdominios.
+
+### `[01]` Verificación de Subdominios Vivos
+
+Verifica cuáles subdominios resuelven actualmente a una IP real.
+
+```bash
+cat subdominios_crudos.txt | dnsx -a -resp
+```
+
+### `[02]` Extracción de CNAME — Subdomain Takeover Recon
+
+Identifica registros CNAME apuntando a servicios de terceros (AWS, GitHub Pages, Azure) potencialmente vulnerables.
+
+```bash
+cat subdominios_crudos.txt | dnsx -cname -resp
+```
+
+---
+
+## 💻 PowerShell — Living off the Land
+
+![Platform](https://img.shields.io/badge/Platform-Windows-0078d4?style=flat-square&logo=windows&logoColor=white)
+![Technique](https://img.shields.io/badge/Technique-LotL-5865f2?style=flat-square)
+
+Para pentesting en entornos Windows (**Assumed Breach / Internal Recon**) sin instalar herramientas de terceros.
+
+### `[01]` Enumeración de Servicios Internos (SRV)
+
+Descubre controladores de dominio, servidores de catálogo global o servicios LDAP.
+
+```powershell
+Resolve-DnsName -Name _ldap._tcp.dc._msdcs.dominio.local -Type SRV
+```
+
+### `[02]` Resolución Básica y MX
+
+```powershell
+Resolve-DnsName -Name example.com -Type MX
+```
+
+---
+
+## 🗺️ ASNs — Mapeo de Rangos IP
+
+Un **Autonomous System Number (ASN)** es un identificador único asignado por la IANA a un sistema autónomo que administra bloques de IPs. Mapear los ASNs del objetivo permite descubrir **toda su superficie de red**.
+
+### Recursos Online
+
+| Plataforma | URL | API | Región |
+|------------|-----|-----|--------|
+| Hurricane Electric BGP | [bgp.he.net](https://bgp.he.net/) | ✅ Free | Global |
+| BGPView | [bgpview.io](https://bgpview.io/) | ✅ Free | Global |
+| IPInfo | [ipinfo.io](https://ipinfo.io/) | ✅ Free | Global |
+| ASN Lookup | [asnlookup.com](http://asnlookup.com/) | ✅ Free | Global |
+| IPv4Info | [ipv4info.com](http://ipv4info.com/) | ❌ | Global |
+| AFRINIC | [afrinic.net](https://www.afrinic.net/) | — | África |
+| ARIN | [arin.net](https://www.arin.net/) | — | Norte América |
+| APNIC | [apnic.net](https://www.apnic.net/) | — | Asia |
+| LACNIC | [lacnic.net](https://www.lacnic.net/) | — | Latinoamérica |
+| RIPE NCC | [ripe.net](https://www.ripe.net/) | — | Europa |
+
+### BBOT — Output Automático de ASNs
 
 ```bash
 bbot -t tesla.com -f subdomain-enum
 ```
 
-Ejemplo de salida:
-
 ```
 [INFO] bbot.modules.asn: | AS394161 | 8.244.131.0/24  | 5 | TESLA     | Tesla Motors, Inc.  | US |
 [INFO] bbot.modules.asn: | AS16509  | 54.148.0.0/15   | 4 | AMAZON-02 | Amazon.com, Inc.    | US |
 [INFO] bbot.modules.asn: | AS394161 | 8.45.124.0/24   | 3 | TESLA     | Tesla Motors, Inc.  | US |
+[INFO] bbot.modules.asn: | AS3356   | 8.32.0.0/12     | 1 | LEVEL3    | Level 3 Parent, LLC | US |
 ```
 
 ---
@@ -227,14 +266,11 @@ Ejemplo de salida:
 
 ### Reverse DNS
 
-Con los rangos IP identificados, se pueden realizar lookups inversos para encontrar más dominios asociados.
+Con los rangos IP identificados, realizar lookups inversos para encontrar más dominios.
 
 ```bash
 # Rango completo con servidor DNS específico
 dnsrecon -r <DNS_Range> -n <IP_DNS>
-
-# Usando el DNS de Facebook como referencia
-dnsrecon -d facebook.com -r 157.240.221.35/24
 
 # Usando Cloudflare como resolver
 dnsrecon -r 157.240.221.35/24 -n 1.1.1.1
@@ -243,58 +279,72 @@ dnsrecon -r 157.240.221.35/24 -n 1.1.1.1
 dnsrecon -r 157.240.221.35/24 -n 8.8.8.8
 ```
 
-> **Nota:** El administrador debe haber habilitado manualmente el registro PTR para que funcione. También se puede usar [ptrarchive.com](http://ptrarchive.com/) como recurso online. Para rangos grandes, `massdns` y `dnsx` son ideales para automatizar.
+> [!NOTE]
+> El administrador debe haber habilitado manualmente el registro PTR. Para rangos grandes, `massdns` y `dnsx` son ideales para automatizar. También se puede usar [ptrarchive.com](http://ptrarchive.com/).
 
 ### Reverse Whois (Loop)
 
-Los registros WHOIS contienen campos como organización, dirección, emails y teléfonos. Realizar búsquedas inversas por esos campos permite descubrir más activos relacionados.
+Los registros WHOIS contienen organización, dirección, emails y teléfonos. Las búsquedas inversas por esos campos revelan más activos relacionados.
 
-**Herramientas online (gratuitas):**
-- https://viewdns.info/reversewhois/
-- https://domaineye.com/reverse-whois
-- https://www.reversewhois.io/
-- https://www.whoxy.com/
+**Herramientas gratuitas:**
 
-**Herramientas online (de pago):**
-- https://securitytrails.com/
-- https://drs.whoisxmlapi.com/reverse-whois-search
-- https://whoisfreaks.com/
+| Herramienta | URL |
+|-------------|-----|
+| ViewDNS | [viewdns.info/reversewhois](https://viewdns.info/reversewhois/) |
+| DomainEye | [domaineye.com/reverse-whois](https://domaineye.com/reverse-whois) |
+| ReverseWhois | [reversewhois.io](https://www.reversewhois.io/) |
+| Whoxy | [whoxy.com](https://www.whoxy.com/) |
+
+**Herramientas de pago:**
+
+| Herramienta | URL |
+|-------------|-----|
+| SecurityTrails | [securitytrails.com](https://securitytrails.com/) |
+| WhoisXML API | [drs.whoisxmlapi.com](https://drs.whoisxmlapi.com/reverse-whois-search) |
+| WhoisFreaks | [whoisfreaks.com](https://whoisfreaks.com/) |
 
 ```bash
 # Automatización con Amass
 amass intel -d tesla.com -whois
 ```
 
-> 💡 **Tip:** Se puede usar DomLink (requiere API key de Whoxy) para automatizar el proceso de reverse whois en bucle.
+### Certificate Transparency Logs
 
-### Trackers (Analytics & Ads IDs)
+```bash
+# crt.sh — función bash
+crt(){
+  curl -s "https://crt.sh/?q=%25.$1" \
+    | grep -oE "[\.a-zA-Z0-9-]+\.$1" \
+    | sort -u
+}
+crt tesla.com
+```
 
-Si dos páginas comparten el mismo ID de Google Analytics o Adsense, probablemente son administradas por el mismo equipo. Herramientas útiles:
+**Recursos CT:**
 
-- [BuiltWith](https://builtwith.com/)
-- [Publicwww](https://publicwww.com/)
-- [SpyOnWeb](https://spyonweb.com/)
-- [Webscout](https://webscout.io/)
+| Recurso | URL |
+|---------|-----|
+| crt.sh | [crt.sh](https://crt.sh/) |
+| CertSpotter | [certspotter.com](https://certspotter.com/) |
+| Censys | [search.censys.io](https://search.censys.io/) |
+| Chaos | [chaos.projectdiscovery.io](https://chaos.projectdiscovery.io/) |
 
 ### Favicon Hash
-
-Buscar dominios relacionados a través del hash del ícono favicon:
 
 ```bash
 # Generar lista de targets
 cat my_targets.txt | xargs -I %% bash -c 'echo "http://%%/favicon.ico"' > targets.txt
-
-# Usar favihash
 python3 favihash.py -f https://target/favicon.ico -t targets.txt -s
 
-# Obtener hashes a escala con httpx
+# Escala con httpx
 httpx -l targets.txt -favicon
 
-# Pivotear en Shodan con el hash
-shodan search org:"Target" http.favicon.hash:116323821 --fields ip_str,port --separator " " | awk '{print $1":"$2}'
+# Pivot en Shodan
+shodan search org:"Target" http.favicon.hash:116323821 \
+  --fields ip_str,port --separator " " | awk '{print $1":"$2}'
 ```
 
-Script Python para calcular el hash de un favicon:
+Script Python para calcular el hash:
 
 ```python
 import mmh3
@@ -309,58 +359,14 @@ def fav_hash(url):
     return fhash
 ```
 
-### Certificados de Transparencia (Certificate Transparency)
-
-Los logs de CT registran todos los certificados emitidos y son una fuente excelente para descubrir dominios y subdominios:
-
-```bash
-# API de crt.sh
-crt(){
-  curl -s "https://crt.sh/?q=%25.$1" \
-    | grep -oE "[\.a-zA-Z0-9-]+\.$1" \
-    | sort -u
-}
-crt tesla.com
-```
-
-**Recursos online:**
-- https://crt.sh/
-- https://certspotter.com/
-- https://search.censys.io/
-- https://chaos.projectdiscovery.io/
-
-### Copyright / Strings Únicas
-
-Buscar cadenas de texto únicas (como el copyright) que aparezcan en múltiples propiedades de la misma organización:
-
-```bash
-# En Shodan
-shodan search http.html:"Copyright string"
-```
-
-### Mail DMARC
-
-Usar registros DMARC para descubrir dominios y subdominios relacionados:
-
-- Online: https://dmarc.live/info/google.com
-- Herramientas: `spoofcheck`, `dmarcian`, [dmarc-subdomains](https://github.com/Tedixx/dmarc-subdomains)
-
 ---
 
-## 🗺️ Descubrimiento de Subdominios
+## 🗂️ Descubrimiento de Subdominios
 
-### DNS - Zone Transfer
-
-```bash
-dnsrecon -a -d tesla.com
-```
-
-### OSINT - Herramientas Principales
-
-#### BBOT
+### BBOT — Suite Completa
 
 ```bash
-# Enumeración completa de subdominios
+# Enumeración completa
 bbot -t tesla.com -f subdomain-enum
 
 # Solo fuentes pasivas
@@ -370,38 +376,40 @@ bbot -t tesla.com -f subdomain-enum -rf passive
 bbot -t tesla.com -f subdomain-enum -m naabu gowitness -n my_scan -o .
 ```
 
-#### Amass
+### Suite OSINT Principal
 
 ```bash
+# Amass
 amass enum [-active] [-ip] -d tesla.com
 amass enum -d tesla.com | grep tesla.com
+
+# Subfinder
+./subfinder-linux-amd64 -d tesla.com -silent
+
+# Findomain
+./findomain-linux -t tesla.com --quiet
+
+# OneForAll
+python3 oneforall.py --target tesla.com run
+
+# assetfinder
+assetfinder --subs-only tesla.com
+
+# vita
+vita -d tesla.com
 ```
 
-#### Subfinder
+### theHarvester — Multi-motor
 
 ```bash
-./subfinder-linux-amd64 -d tesla.com [-silent]
+theHarvester -d tesla.com -b "anubis, baidu, bing, binaryedge, bingapi, \
+bufferoverun, censys, certspotter, crtsh, dnsdumpster, duckduckgo, fullhunt, \
+github-code, google, hackertarget, hunter, intelx, linkedin, omnisint, otx, \
+pentesttools, projectdiscovery, qwant, rapiddns, rocketreach, securityTrails, \
+sublist3r, threatcrowd, threatminer, trello, urlscan, virustotal, yahoo, zoomeye"
 ```
 
-#### Findomain
-
-```bash
-./findomain-linux -t tesla.com [--quiet]
-```
-
-#### OneForAll
-
-```bash
-python3 oneforall.py --target tesla.com [--dns False] [--req False] [--brute False] run
-```
-
-#### theHarvester
-
-```bash
-theHarvester -d tesla.com -b "anubis, baidu, bing, binaryedge, bingapi, bufferoverun, censys, certspotter, crtsh, dnsdumpster, duckduckgo, fullhunt, github-code, google, hackertarget, hunter, intelx, linkedin, linkedin_links, n45ht, omnisint, otx, pentesttools, projectdiscovery, qwant, rapiddns, rocketreach, securityTrails, sublist3r, threatcrowd, threatminer, trello, twitter, urlscan, virustotal, yahoo, zoomeye"
-```
-
-### APIs Gratuitas para Subdominios
+### APIs Gratuitas
 
 ```bash
 # Sonar / Crobat
@@ -436,50 +444,34 @@ python3 censys-subdomain-finder.py tesla.com
 
 ### DNS Brute-Force
 
-**Wordlists recomendadas:**
-- https://gist.github.com/jhaddix/86a06c5dc309d08580a018c66354a056
-- https://wordlists-cdn.assetnote.io/data/manual/best-dns-wordlist.txt
-- https://github.com/danielmiessler/SecLists/tree/master/Discovery/DNS
-
-**Resolvers confiables:**
-- https://public-dns.info/nameservers-all.txt (filtrar con `dnsvalidator`)
-- https://raw.githubusercontent.com/trickest/resolvers/main/resolvers-trusted.txt
-
-#### massdns
+> [!TIP]
+> **Wordlists recomendadas:**
+> - [jhaddix — all.txt](https://gist.github.com/jhaddix/86a06c5dc309d08580a018c66354a056)
+> - [Assetnote — best-dns-wordlist.txt](https://wordlists-cdn.assetnote.io/data/manual/best-dns-wordlist.txt)
+> - [SecLists — Discovery/DNS](https://github.com/danielmiessler/SecLists/tree/master/Discovery/DNS)
+>
+> **Resolvers confiables:** [trickest/resolvers](https://raw.githubusercontent.com/trickest/resolvers/main/resolvers-trusted.txt)
 
 ```bash
+# massdns — muy rápido
 sed 's/$/.domain.com/' subdomains.txt > bf-subdomains.txt
 ./massdns -r resolvers.txt -w /tmp/results.txt bf-subdomains.txt
 grep -E "tesla.com. [0-9]+ IN A .+" /tmp/results.txt
-```
 
-#### gobuster
-
-```bash
+# gobuster
 gobuster dns -d mysite.com -t 50 -w subdomains.txt
-```
 
-#### shuffledns
-
-```bash
+# shuffledns (massdns wrapper + wildcard support)
 shuffledns -d example.com -list example-subdomains.txt -r resolvers.txt
-```
 
-#### puredns
-
-```bash
+# puredns
 puredns bruteforce all.txt domain.com
-```
 
-#### aiodnsbrute
-
-```bash
+# aiodnsbrute (async)
 aiodnsbrute -r resolvers -w wordlist.txt -vv -t 1024 domain.com
 ```
 
-### Segunda Ronda: Permutaciones de Subdominios
-
-Después del brute-force inicial, se generan permutaciones para descubrir aún más subdominios:
+### Segunda Ronda — Permutaciones
 
 ```bash
 # dnsgen
@@ -503,26 +495,27 @@ echo www | subzuf facebook.com
 
 ## 🖥️ Virtual Hosts (VHosts)
 
-Si una IP aloja múltiples subdominios, se pueden descubrir más mediante fuzzing del header `Host`:
-
 ### Fuzzing con ffuf
 
 ```bash
-# Auto-calibración para destacar respuestas distintas al vhost por defecto
+# Auto-calibración — destaca respuestas distintas al vhost por defecto
 ffuf -u http://10.10.10.10 -H "Host: FUZZ.example.com" \
   -w /opt/SecLists/Discovery/DNS/subdomains-top1million-20000.txt -ac
 
 ffuf -c -w /path/to/wordlist -u http://victim.com -H "Host: FUZZ.victim.com"
 ```
 
-### Otras herramientas para VHosts
+### Otras Herramientas
 
 ```bash
+# gobuster vhost
 gobuster vhost -u https://mysite.com -t 50 -w subdomains.txt
 
+# wfuzz
 wfuzz -c -w /usr/share/wordlists/SecLists/Discovery/DNS/subdomains-top1million-20000.txt \
   --hc 400,404,403 -H "Host: FUZZ.example.com" -u http://example.com -t 100
 
+# VHostScan
 VHostScan -t example.com
 ```
 
@@ -532,90 +525,102 @@ Detectar subdominios válidos abusando del header `Access-Control-Allow-Origin`:
 
 ```bash
 ffuf -w subdomains-top1million-5000.txt -u http://10.10.10.208 \
-  -H 'Origin: http://FUZZ.crossfit.htb' -mr "Access-Control-Allow-Origin" -ignore-body
+  -H 'Origin: http://FUZZ.crossfit.htb' \
+  -mr "Access-Control-Allow-Origin" -ignore-body
 ```
+
+> [!TIP]
+> Con estas técnicas es posible acceder a **endpoints internos/ocultos** no expuestos públicamente.
 
 ---
 
-## 🔗 Búsqueda de Credenciales y Secretos Filtrados
+## 🔑 Credenciales & Secretos Filtrados
 
 ### Credential Leaks
 
-```
-https://leak-lookup.com
-https://www.dehashed.com/
-```
+| Plataforma | URL | Notas |
+|------------|-----|-------|
+| Leak Lookup | [leak-lookup.com](https://leak-lookup.com) | Gratuito |
+| DeHashed | [dehashed.com](https://www.dehashed.com/) | De pago |
 
 ### GitHub Leaks
 
 ```bash
-# Usar Leakos para escanear repos públicos de una organización con gitleaks
+# Leakos + gitleaks sobre repos públicos de una organización
 leakos -org <organization>
 ```
 
-**GitHub Dorks útiles:** buscar combinaciones de `org:empresa password`, `org:empresa api_key`, `org:empresa secret`, etc.
+**GitHub Dorks útiles:**
 
-### Pastes Leaks
+```
+org:empresa password
+org:empresa api_key
+org:empresa secret
+org:empresa token
+org:empresa private_key
+```
 
-Usar [Pastos](https://github.com/carlospolop/Pastos) para buscar simultáneamente en más de 80 sitios de paste.
+### Google Dorks & Pastes
 
-### Google Dorks
+```bash
+# Google Dorks automatizados (Google Hacking Database)
+gorks -d empresa.com
 
-Usar [Gorks](https://github.com/carlospolop/Gorks) para automatizar búsquedas de la [Google Hacking Database](https://www.exploit-db.com/google-hacking-database).
+# Pastes en 80+ sitios simultáneos
+pastos -d empresa.com
+
+# Shodan — copyright string
+shodan search http.html:"Copyright empresa"
+```
 
 ---
 
-## 🌩️ Cloud Assets Públicos
-
-Buscar buckets y recursos cloud expuestos usando keywords de la empresa:
+## ☁️ Cloud Assets Públicos
 
 ```bash
-# Herramientas recomendadas
+# cloud_enum
 cloud_enum -k empresa -k empresa.com
-CloudScraper
-S3Scanner
+
+# S3Scanner
+S3Scanner scan --buckets-file wordlist.txt
+
+# CloudScraper
+CloudScraper -d empresa.com
 ```
 
 **Wordlists para buckets:**
-- https://raw.githubusercontent.com/cujanovic/goaltdns/master/words.txt
-- https://raw.githubusercontent.com/jordanpotti/AWSBucketDump/master/BucketNames.txt
+- [cujanovic/goaltdns — words.txt](https://raw.githubusercontent.com/cujanovic/goaltdns/master/words.txt)
+- [jordanpotti/AWSBucketDump — BucketNames.txt](https://raw.githubusercontent.com/jordanpotti/AWSBucketDump/master/BucketNames.txt)
 
----
+> [!NOTE]
+> Buscar más allá de S3: **Azure Blobs, GCP Storage, Firebase** y otros servicios cloud son igualmente relevantes.
 
-## 🕸️ Web Servers Hunting
-
-Descubrir servidores web activos dentro del scope:
+### Web Servers Hunting
 
 ```bash
-# httprobe: prueba puertos 80 y 443
+# httprobe — prueba puertos 80 y 443
 cat /tmp/domains.txt | httprobe
 
 # Con puertos adicionales
 cat /tmp/domains.txt | httprobe -p http:8080 -p https:8443
-```
 
-### Screenshots Masivos
-
-Tomar capturas de pantalla de todos los servidores web para identificar endpoints interesantes:
-
-```bash
+# Screenshots masivos
 gowitness file -f domains.txt
 eyewitness --web -f domains.txt
 ```
 
----
-
-## ✉️ Búsqueda de Emails
+### Búsqueda de Emails
 
 ```bash
 # theHarvester con APIs
 theHarvester -d tesla.com -b linkedin,google,hunter
-
-# APIs con plan gratuito
-# https://hunter.io/
-# https://app.snov.io/
-# https://minelead.io/
 ```
+
+| API | URL | Plan |
+|-----|-----|------|
+| Hunter.io | [hunter.io](https://hunter.io/) | Free tier |
+| Snov.io | [app.snov.io](https://app.snov.io/) | Free tier |
+| Minelead | [minelead.io](https://minelead.io/) | Free tier |
 
 ---
 
@@ -624,24 +629,29 @@ theHarvester -d tesla.com -b linkedin,google,hunter
 Al finalizar esta fase, deberías haber cubierto:
 
 - ✅ Todas las empresas dentro del scope
-- ✅ Activos de red (rangos IP, ASNs)
-- ✅ Dominios raíz y subdominios (con análisis de subdomain takeover)
+- ✅ Activos de red: rangos IP y ASNs
+- ✅ Dominios raíz y subdominios
+- ✅ Análisis de Subdomain Takeover
 - ✅ IPs dentro y fuera de CDNs
-- ✅ Servidores web identificados y con screenshots
-- ✅ Cloud assets públicos (buckets S3, Azure Blobs, etc.)
+- ✅ Web servers identificados y con screenshots
+- ✅ Cloud assets públicos (S3, Azure Blobs, GCP, etc.)
 - ✅ Emails, credenciales y secretos filtrados
 
----
+### 🤖 Herramientas de Full Recon Automatizado
 
-## 🤖 Herramientas de Reconocimiento Automatizado (Full Recon)
-
-| Herramienta | URL |
-|-------------|-----|
-| ReNgine | https://github.com/yogeshojha/rengine |
-| Osmedeus | https://github.com/j3ssie/Osmedeus |
-| reconFTW | https://github.com/six2dez/reconftw |
-| EchoPwn | https://github.com/hackerspider1/EchoPwn |
+| Herramienta | Repositorio | Estado |
+|-------------|-------------|--------|
+| **ReNgine** | [yogeshojha/rengine](https://github.com/yogeshojha/rengine) | ![](https://img.shields.io/badge/-Activo-00ff88?style=flat-square) |
+| **Osmedeus** | [j3ssie/Osmedeus](https://github.com/j3ssie/Osmedeus) | ![](https://img.shields.io/badge/-Activo-00ff88?style=flat-square) |
+| **reconFTW** | [six2dez/reconftw](https://github.com/six2dez/reconftw) | ![](https://img.shields.io/badge/-Activo-00ff88?style=flat-square) |
+| **EchoPwn** | [hackerspider1/EchoPwn](https://github.com/hackerspider1/EchoPwn) | ![](https://img.shields.io/badge/-Legacy-ffb300?style=flat-square) |
 
 ---
 
-*Documentación generada para uso en entornos de auditoría autorizados.*
+<div align="center">
+
+![](https://img.shields.io/badge/Uso-Solo%20en%20entornos%20autorizados-ff3c6e?style=for-the-badge)
+
+*Documentación generada para uso en entornos de auditoría autorizados · Offensive Security Arsenal*
+
+</div>
