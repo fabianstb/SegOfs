@@ -180,30 +180,6 @@ sublist3r -d example.com -e google,yahoo,virustotal -t 10
 
 ---
 
-## 🔀 dnsx — Resolución Masiva y Filtrado
-
-![Tool](https://img.shields.io/badge/Tool-dnsx-00d4ff?style=flat-square&logo=go&logoColor=white)
-![Author](https://img.shields.io/badge/By-ProjectDiscovery-ff3c6e?style=flat-square)
-
-Toolkit DNS rápido y multipropósito diseñado para manejar listas inmensas de subdominios.
-
-### `[01]` Verificación de Subdominios Vivos
-
-Verifica cuáles subdominios resuelven actualmente a una IP real.
-
-```bash
-cat subdominios_crudos.txt | dnsx -a -resp
-```
-
-### `[02]` Extracción de CNAME — Subdomain Takeover Recon
-
-Identifica registros CNAME apuntando a servicios de terceros (AWS, GitHub Pages, Azure) potencialmente vulnerables.
-
-```bash
-cat subdominios_crudos.txt | dnsx -cname -resp
-```
-
----
 
 ## 💻 PowerShell — Living off the Land
 
@@ -247,18 +223,6 @@ Un **Autonomous System Number (ASN)** es un identificador único asignado por la
 | LACNIC | [lacnic.net](https://www.lacnic.net/) | — | Latinoamérica |
 | RIPE NCC | [ripe.net](https://www.ripe.net/) | — | Europa |
 
-### BBOT — Output Automático de ASNs
-
-```bash
-bbot -t tesla.com -f subdomain-enum
-```
-
-```
-[INFO] bbot.modules.asn: | AS394161 | 8.244.131.0/24  | 5 | TESLA     | Tesla Motors, Inc.  | US |
-[INFO] bbot.modules.asn: | AS16509  | 54.148.0.0/15   | 4 | AMAZON-02 | Amazon.com, Inc.    | US |
-[INFO] bbot.modules.asn: | AS394161 | 8.45.124.0/24   | 3 | TESLA     | Tesla Motors, Inc.  | US |
-[INFO] bbot.modules.asn: | AS3356   | 8.32.0.0/12     | 1 | LEVEL3    | Level 3 Parent, LLC | US |
-```
 
 ---
 
@@ -471,26 +435,6 @@ puredns bruteforce all.txt domain.com
 aiodnsbrute -r resolvers -w wordlist.txt -vv -t 1024 domain.com
 ```
 
-### Segunda Ronda — Permutaciones
-
-```bash
-# dnsgen
-cat subdomains.txt | dnsgen -
-
-# gotator
-gotator -sub subdomains.txt -silent [-perm /tmp/words-permutations.txt]
-
-# alterx
-alterx -d tesla.com
-
-# dmut
-cat subdomains.txt | dmut -d /tmp/words-permutations.txt -w 100 \
-    --dns-errorLimit 10 --use-pb --verbose -s /tmp/resolvers-trusted.txt
-
-# subzuf
-echo www | subzuf facebook.com
-```
-
 ---
 
 ## 🖥️ Virtual Hosts (VHosts)
@@ -623,6 +567,306 @@ theHarvester -d tesla.com -b linkedin,google,hunter
 | Minelead | [minelead.io](https://minelead.io/) | Free tier |
 
 ---
+> **¿Qué es el Google Hacking / Dorking?**
+> Consiste en utilizar **operadores de búsqueda avanzada** para filtrar resultados de Google y encontrar información específica que no aparece en búsquedas normales. Se considera una técnica **no invasiva**, ya que las consultas se realizan sobre la base de datos de Google y no directamente contra el servidor del objetivo.
+
+---
+
+## 📑 Tabla de Contenidos
+
+| # | Sección |
+|---|---------|
+| 01 | [🔧 Operadores Fundamentales](#-operadores-fundamentales) |
+| 02 | [🔐 Credenciales & Configuración](#-credenciales--archivos-de-configuración) |
+| 03 | [🖥️ Información Técnica del Servidor](#️-información-técnica-del-servidor-y-errores) |
+| 04 | [💾 Archivos Expuestos & Backups](#-archivos-expuestos-y-copias-de-seguridad) |
+| 05 | [🧩 CMS, Paneles & Software](#-identificación-de-software-cms-y-paneles) |
+| 06 | [⚙️ Operadores Combinados](#️-operadores-combinados-para-mayor-precisión) |
+| 07 | [📋 Ejemplos Prácticos](#-10-ejemplos-prácticos) |
+
+---
+
+## 🔧 Operadores Fundamentales
+
+| Operador | Sintaxis | Descripción |
+|----------|----------|-------------|
+| **site** | `site:ejemplo.com` | Limita la búsqueda a un dominio o sitio web específico |
+| **filetype / ext** | `filetype:pdf` | Busca archivos con una extensión particular (`pdf`, `doc`, `sql`, etc.) |
+| **inurl** | `inurl:admin` | Encuentra términos específicos dentro de la URL de las páginas |
+| **intitle** | `intitle:"Index of"` | Busca términos que aparezcan en el título de la página web |
+| **intext** | `intext:password` | Busca una palabra o frase dentro del cuerpo del texto |
+| **cache** | `cache:ejemplo.com` | Muestra la versión en caché almacenada por Google |
+| **`*`** (comodín) | `"admin * login"` | Representa cualquier palabra o carácter en una frase |
+| **`" "`** (comillas) | `"frase exacta"` | Obliga a Google a buscar la frase exacta |
+| **`-`** (exclusión) | `-inurl:login` | Excluye términos o sitios específicos de los resultados |
+| **`OR`** | `inurl:login OR inurl:admin` | Busca páginas que contengan uno u otro término |
+| **`..`** (rango) | `100..500` | Filtra resultados dentro de un rango numérico |
+
+---
+## 🔐 Credenciales & Archivos de Configuración
+
+![Category](https://img.shields.io/badge/Category-Credentials-ff3c6e?style=flat-square)
+![Risk](https://img.shields.io/badge/Risk-Critical-ff3c6e?style=flat-square)
+
+Comandos orientados a localizar archivos que suelen contener contraseñas, claves de API o configuraciones críticas del sistema.
+
+### `[01]` Claves Privadas SSH
+
+```bash
+intitle:index.of id_rsa -id_rsa.pub
+```
+
+> [!IMPORTANT]
+> Busca archivos de clave privada `id_rsa` excluyendo las públicas. Un hallazgo de este tipo representa una **falla crítica de seguridad**.
+
+### `[02]` Archivos de Entorno `.env`
+
+```bash
+intitle:"index of" intext:.env
+```
+
+```bash
+filetype:env intext:APP_ENV
+```
+
+> [!NOTE]
+> Los archivos `.env` suelen contener credenciales de bases de datos, claves de API y secretos de aplicaciones.
+
+### `[03]` Archivos de Configuración PHP
+
+```bash
+intitle:"index of" intext:config.php
+```
+
+### `[04]` Archivos de Contraseñas y Logs
+
+```bash
+intitle:"Index of" password.txt
+```
+
+```bash
+filetype:log inurl:"password.log"
+```
+
+### `[05]` Configuración de Servicios
+
+```bash
+# Configuración SFTP
+intitle:"index of" intext:sftp-config.json
+
+# Configuración ASP.NET
+intitle:"index of" intext:web.config
+```
+
+---
+
+## 🖥️ Información Técnica del Servidor y Errores
+
+![Category](https://img.shields.io/badge/Category-Server%20Info-ffb300?style=flat-square)
+![Risk](https://img.shields.io/badge/Risk-High-ffb300?style=flat-square)
+
+Útiles para identificar versiones de software, tecnologías en uso o posibles vectores de ataque.
+
+### `[01]` PHP Info — Configuración Interna
+
+```bash
+inurl:"/phpinfo.php"
+```
+
+> [!NOTE]
+> Expone detalles técnicos sobre la configuración de PHP, rutas del servidor, módulos activos y variables de entorno.
+
+### `[02]` Información del Servidor Apache
+
+```bash
+inurl:server-info "Apache Server Information"
+```
+
+### `[03]` Errores de Sintaxis SQL — SQLi Recon
+
+```bash
+intext:"sql syntax near"
+```
+
+```bash
+intext:"Warning: mysql_fetch"
+```
+
+> [!IMPORTANT]
+> Identifica sitios que podrían ser vulnerables a **inyecciones SQL** mediante mensajes de error expuestos.
+
+### `[04]` Directorio de Trabajo del Servidor
+
+```bash
+inurl:/proc/self/cwd
+```
+
+---
+
+## 💾 Archivos Expuestos y Copias de Seguridad
+
+![Category](https://img.shields.io/badge/Category-Exposed%20Files-a855f7?style=flat-square)
+![Risk](https://img.shields.io/badge/Risk-High-ffb300?style=flat-square)
+
+Permiten localizar bases de datos, documentos o directorios que no deberían ser accesibles públicamente.
+
+### `[01]` Directorios de Backup
+
+```bash
+intitle:"Index of" /backup
+```
+
+```bash
+site:example.com inurl:backup
+```
+
+### `[02]` Bases de Datos SQL Expuestas
+
+```bash
+site:example.com ext:sql
+```
+
+```bash
+intitle:"index of" "database.sql"
+```
+
+### `[03]` Documentos Gubernamentales Confidenciales
+
+```bash
+site:.gov intitle:"secret" filetype:pdf
+```
+
+### `[04]` Hojas de Cálculo con Emails
+
+```bash
+filetype:xls inurl:"email.xls"
+```
+
+### `[05]` Bases de Datos de WhatsApp
+
+```bash
+intitle:"index of" "WhatsAppDB.csv"
+```
+
+---
+
+## 🧩 Identificación de Software, CMS y Paneles
+
+![Category](https://img.shields.io/badge/Category-CMS%20%7C%20Panels-00d4ff?style=flat-square)
+
+Determinan qué tecnologías utiliza un sitio web y localizan sus accesos administrativos.
+
+### `[01]` Paneles de Administración y Login
+
+```bash
+site:example.com (inurl:login OR inurl:admin)
+```
+
+### `[02]` phpMyAdmin
+
+```bash
+intext:"Welcome to phpMyAdmin"
+```
+
+### `[03]` Identificación de CMS
+
+```bash
+# WordPress
+intext:"Powered by Wordpress"
+
+# vBulletin
+intext:"powered by vBulletin"
+
+# phpBB
+intext:"Powered by phpBB"
+```
+
+### `[04]` Cámaras Web Accesibles Públicamente
+
+```bash
+intitle:"WebcamXP 5"
+```
+
+```bash
+inurl:"ViewerFrame?Mode="
+```
+
+> [!WARNING]
+> Estas búsquedas localizan interfaces de cámaras que **no requieren autenticación** para ser visualizadas.
+
+---
+
+## ⚙️ Operadores Combinados para Mayor Precisión
+
+![Category](https://img.shields.io/badge/Category-Advanced-00ff88?style=flat-square)
+
+Combinar operadores permite filtrar resultados con mayor precisión y reducir el ruido en las búsquedas.
+
+### `[01]` Excluir Páginas Conocidas
+
+```bash
+site:bank.com NOT inurl:login
+```
+
+### `[02]` Manuales de Usuario en PDF
+
+```bash
+site:socialnetwork.com filetype:pdf user* manual
+```
+
+### `[03]` Búsqueda por Rango de Precio
+
+```bash
+site:ecommerce.com "price" 100..500
+```
+
+### `[04]` Combinar Dominio + Extensión + Texto
+
+```bash
+site:example.com filetype:sql intext:password
+```
+
+### `[05]` Múltiples Extensiones con OR
+
+```bash
+site:example.com (filetype:doc OR filetype:pdf OR filetype:xls) intext:confidential
+```
+
+---
+
+## 📋 10+ Ejemplos Prácticos
+
+Resumen de los dorks más utilizados en auditorías reales:
+
+| # | Objetivo | Dork |
+|---|----------|------|
+| 01 | Páginas de login y admin | `site:example.com (inurl:login OR inurl:admin)` |
+| 02 | Directorios con `password.txt` | `intitle:"Index of" password.txt` |
+| 03 | Backups de bases de datos | `site:example.com filetype:sql` |
+| 04 | Archivos `.env` expuestos | `intitle:"index of" intext:.env` |
+| 05 | Claves privadas SSH | `intitle:index.of id_rsa -id_rsa.pub` |
+| 06 | Logs con credenciales | `filetype:log inurl:"password.log"` |
+| 07 | PHP Info del servidor | `inurl:"/phpinfo.php"` |
+| 08 | Excel con emails | `filetype:xls inurl:"email.xls"` |
+| 09 | Carpetas de backup | `intitle:"Index of" /backup` |
+| 10 | Cámaras web abiertas | `intitle:"WebcamXP 5"` |
+| 11 | Archivos `web.config` | `intitle:"index of" intext:web.config` |
+| 12 | Errores SQL expuestos | `intext:"sql syntax near"` |
+
+---
+
+## 📚 Recursos Adicionales
+
+| Recurso | URL | Descripción |
+|---------|-----|-------------|
+| Google Hacking DB | [exploit-db.com/google-hacking-database](https://www.exploit-db.com/google-hacking-database) | Base de datos oficial de dorks |
+| Gorks | [github.com/carlospolop/Gorks](https://github.com/carlospolop/Gorks) | Automatización de la GHDB |
+| DorkSearch | [dorksearch.com](https://dorksearch.com/) | Motor de búsqueda de dorks |
+| Pentest-Tools Dork | [pentest-tools.com](https://pentest-tools.com/information-gathering/google-hacking) | Google dorking online |
+
+> [!TIP]
+> Combina Google Dorks con herramientas como **Shodan** (`shodan search http.html:"string"`) para ampliar la superficie de búsqueda más allá de los resultados indexados por Google.
+
 
 ## 📊 Recapitulación del Proceso
 
@@ -652,6 +896,6 @@ Al finalizar esta fase, deberías haber cubierto:
 
 ![](https://img.shields.io/badge/Uso-Solo%20en%20entornos%20autorizados-ff3c6e?style=for-the-badge)
 
-*Documentación generada para uso en entornos de auditoría autorizados · Offensive Security Arsenal*
+*Documentación generada para uso en entornos de auditoría autorizados · Offensive Security*
 
 </div>
