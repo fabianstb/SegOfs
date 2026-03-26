@@ -1,94 +1,154 @@
-# Taller de Seguridad Ofensiva
+<div align="center">
 
-> Material de referencia para las fases del proceso de pentesting. Cada sección contiene comandos, técnicas y cheatsheets organizados por fase.
+# 🔴 Offensive Security
+### Pentesting Reference — Guía de Fases
+
+![Status](https://img.shields.io/badge/Status-Active-ff3c6e?style=for-the-badge&logo=statuspage&logoColor=white)
+![Type](https://img.shields.io/badge/Type-Cheatsheet-00d4ff?style=for-the-badge&logo=hackthebox&logoColor=white)
+![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows-00ff88?style=for-the-badge&logo=linux&logoColor=white)
+
+</div>
 
 ---
 
-## Fases del Pentesting
+> **¿Qué es este repositorio?**
+> Colección de cheatsheets, comandos y técnicas organizadas por fase del ciclo de pentesting. Diseñado como referencia rápida para profesionales y estudiantes de seguridad ofensiva.
+
+> [!WARNING]
+> **Aviso Legal y Ético:** Todas las herramientas y comandos documentados en este repositorio deben ser utilizados única y exclusivamente en entornos donde se posea **autorización explícita por escrito (Reglas de Enfrentamiento / RoE).** El uso no autorizado constituye un delito penal.
+
+---
+
+## 📑 Tabla de Contenidos
+
+| # | Fase | Descripción |
+|---|------|-------------|
+| 01 | [🕵️ Reconocimiento Pasivo](#️-fase-1--reconocimiento-pasivo) | OSINT sin interacción directa con el objetivo |
+| 02 | [🔴 Reconocimiento Activo](#-fase-2--reconocimiento-activo) | Escaneo, enumeración e interacción directa |
+| 03 | [💥 Explotación](#-fase-3--explotación) | Aprovechamiento de vulnerabilidades identificadas |
+| 04 | [⬆️ Post-Explotación](#️-fase-4--post-explotación) | Escalamiento, persistencia y movimiento lateral |
+
+---
+
+## 🔄 Metodología General
 
 ```
-Reconocimiento  →  Escaneo  →  Explotación  →  Post-Explotación
+┌─────────────────────────────────────────────────────────────────┐
+│                    CICLO DE PENTESTING                          │
+│                                                                 │
+│   🕵️ RECON        🔭 ESCANEO      💥 EXPLOTACIÓN               │
+│   PASIVO    ──►   ACTIVO    ──►   & ACCESO      ──►  ...       │
+│   (OSINT)         (Nmap/CME)      (Metasploit)                  │
+│                                                                 │
+│   ⬆️ ESCALAMIENTO  ↔️ MOV. LATERAL   🔒 PERSISTENCIA            │
+│   ... ──►  PRIVESC   ──►  PTH/PTT   ──►  BACKDOOR              │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 1. Reconocimiento
+## 🕵️ Fase 1 — Reconocimiento Pasivo
 
-> Recopilación de información sobre el objetivo antes de interactuar directamente con los sistemas.
+![Category](https://img.shields.io/badge/Category-Passive%20Recon-00ff88?style=flat-square&logo=hackthebox&logoColor=white)
+![Risk](https://img.shields.io/badge/Detección-Muy%20Baja-00ff88?style=flat-square)
 
-| Tipo | Descripción | Link |
-|------|-------------|------|
-| **Pasivo** | OSINT, Shodan, WHOIS, DNS pasivo, Google Dorks, redes sociales | [Reconocimiento/Pasivo.md](Reconocimiento/Pasivo.md) |
-| **Activo** | Nmap, DNS activo, SMB/enum4linux, NetExec/CrackMapExec, SMTP enum, Web fuzzing | [Reconocimiento/Activo.md](Reconocimiento/Activo.md) |
+> Recopilación de información **sin interactuar directamente** con los sistemas del objetivo. Sin tráfico hacia el target.
 
----
+📄 **[→ Ver Reconocimiento Pasivo](Reconocimiento/Pasivo.md)**
 
-## 2. Escaneo & Enumeracion
-
-> Identificación detallada de servicios, versiones, vulnerabilidades y superficies de ataque.
-
-| Herramienta / Técnica | Descripción | Link |
-|-----------------------|-------------|------|
-| **Escaneo de puertos** | TCP/UDP, detección de versiones y OS | *(próximamente)* |
-| **Vulnerability Scanning** | NSE scripts, Nikto, OpenVAS | *(próximamente)* |
-| **Enumeración de servicios** | FTP, SSH, HTTP, SMB, LDAP, RDP | *(próximamente)* |
+| Herramienta | Enfoque | Badge |
+|-------------|---------|-------|
+| **DNSRecon** | Enumeración DNS pasiva, registros, AXFR | ![](https://img.shields.io/badge/-DNS-00d4ff?style=flat-square) |
+| **OWASP Amass** | Mapeo profundo de activos y subdominios | ![](https://img.shields.io/badge/-OSINT-00ff88?style=flat-square) |
+| **Subfinder / Sublist3r** | Descubrimiento de subdominios vía fuentes pasivas | ![](https://img.shields.io/badge/-OSINT-00ff88?style=flat-square) |
+| **dnsx** | Resolución masiva y filtrado DNS | ![](https://img.shields.io/badge/-DNS-00d4ff?style=flat-square) |
+| **PowerShell / LotL** | Recon interno Living off the Land | ![](https://img.shields.io/badge/-LotL-5865f2?style=flat-square) |
+| **Shodan / Censys** | Descubrimiento de activos expuestos en internet | ![](https://img.shields.io/badge/-OSINT-00ff88?style=flat-square) |
 
 ---
 
-## 3. Explotación
+## 🔴 Fase 2 — Reconocimiento Activo
 
-> Aprovechamiento de vulnerabilidades identificadas para ganar acceso al sistema objetivo.
+![Category](https://img.shields.io/badge/Category-Active%20Recon-ff3c6e?style=flat-square&logo=hackthebox&logoColor=white)
+![Risk](https://img.shields.io/badge/Detección-Alta-ff3c6e?style=flat-square)
 
-| Herramienta / Técnica | Descripción | Link |
-|-----------------------|-------------|------|
-| **Metasploit** | Framework de explotación, módulos, msfvenom | *(próximamente)* |
-| **Exploits manuales** | Buffer overflow, SQLi, XSS, RCE | *(próximamente)* |
-| **Password Attacks** | Hydra, Medusa, CrackMapExec spraying | *(próximamente)* |
-| **Web Exploitation** | OWASP Top 10, SQLmap, Burp Suite | *(próximamente)* |
+> Interacción **directa** con los sistemas objetivo. Genera tráfico detectable en IDS/IPS, firewalls y logs.
 
----
+📄 **[→ Ver Reconocimiento Activo](Reconocimiento/Activo.md)**
 
-## 4. Post-Explotación
-
-> Acciones posteriores al acceso inicial: escalamiento de privilegios, movimiento lateral y persistencia.
-
-| Herramienta / Técnica | Descripción | Link |
-|-----------------------|-------------|------|
-| **Escalamiento de Privilegios** | Linux privesc, Windows privesc, sudo abuse | *(próximamente)* |
-| **Movimiento Lateral** | Pass-the-Hash, Pass-the-Ticket, PsExec | *(próximamente)* |
-| **Persistencia** | Backdoors, cronjobs, tareas programadas | *(próximamente)* |
-| **Exfiltración** | Transferencia de datos, canales encubiertos | *(próximamente)* |
-| **Pivoting** | Túneles, proxychains, port forwarding | *(próximamente)* |
+| Herramienta | Enfoque | Badge |
+|-------------|---------|-------|
+| **Nmap** | Escaneo de puertos, versiones, OS, NSE scripts | ![](https://img.shields.io/badge/-SCAN-ff3c6e?style=flat-square) |
+| **enum4linux** | Enumeración SMB, NetBIOS, usuarios, shares | ![](https://img.shields.io/badge/-SMB-ff6b00?style=flat-square) |
+| **NetExec / CrackMapExec** | Enumeración y ataques en entornos AD | ![](https://img.shields.io/badge/-AD-a855f7?style=flat-square) |
+| **FFUF** | Web fuzzing — directorios, parámetros, VHosts | ![](https://img.shields.io/badge/-FUZZ-00d4ff?style=flat-square) |
+| **Gobuster** | Brute-force web, DNS y virtual hosts | ![](https://img.shields.io/badge/-BRUTE-00ff88?style=flat-square) |
+| **smtp-user-enum** | Enumeración de usuarios vía SMTP | ![](https://img.shields.io/badge/-SMTP-ffb300?style=flat-square) |
+| **wafw00f / curl** | Detección WAF e inspección HTTP | ![](https://img.shields.io/badge/-HTTP-5865f2?style=flat-square) |
 
 ---
 
-## Herramientas de Referencia Rápida
+## 💥 Fase 3 — Explotación
 
-| Herramienta | Categoría | Documentada en |
-|-------------|-----------|----------------|
-| Nmap | Escaneo / Enumeración | [Activo.md](Reconocimiento/Activo.md#nmap) |
-| enum4linux | Enumeración SMB | [Activo.md](Reconocimiento/Activo.md#enum4linux--smb--netbios) |
-| NetExec / CrackMapExec | AD / Lateral Movement | [Activo.md](Reconocimiento/Activo.md#netexeccrackmapexec) |
-| FFUF | Web Fuzzing | [Activo.md](Reconocimiento/Activo.md#ffuf) |
-| Gobuster | Web / DNS Fuzzing | [Activo.md](Reconocimiento/Activo.md#gobuster) |
-| theHarvester | OSINT | [Pasivo.md](Reconocimiento/Pasivo.md) |
-| Shodan | OSINT | [Pasivo.md](Reconocimiento/Pasivo.md) |
+![Category](https://img.shields.io/badge/Category-Exploitation-ff6b00?style=flat-square&logo=hackthebox&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Próximamente-555555?style=flat-square)
+
+> Aprovechamiento de vulnerabilidades identificadas en las fases anteriores para obtener acceso al sistema objetivo.
+
+| Herramienta / Técnica | Enfoque | Badge |
+|-----------------------|---------|-------|
+| **Metasploit Framework** | Explotación automatizada, payloads, msfvenom | ![](https://img.shields.io/badge/-MSF-ff6b00?style=flat-square) |
+| **Exploits manuales** | Buffer overflow, RCE, SQLi, LFI/RFI | ![](https://img.shields.io/badge/-MANUAL-ff3c6e?style=flat-square) |
+| **SQLmap** | Inyección SQL automatizada | ![](https://img.shields.io/badge/-SQLi-ffb300?style=flat-square) |
+| **Hydra / Medusa** | Ataques de fuerza bruta a servicios | ![](https://img.shields.io/badge/-BRUTE-ff3c6e?style=flat-square) |
+| **Burp Suite** | Interceptación y explotación web | ![](https://img.shields.io/badge/-WEB-00d4ff?style=flat-square) |
+
+> [!NOTE]
+> Contenido en desarrollo. Próximamente disponible.
 
 ---
 
-## Estructura del Repositorio
+## ⬆️ Fase 4 — Post-Explotación
+
+![Category](https://img.shields.io/badge/Category-Post--Exploitation-a855f7?style=flat-square&logo=hackthebox&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Próximamente-555555?style=flat-square)
+
+> Acciones tras el acceso inicial: escalamiento de privilegios, movimiento lateral, persistencia y exfiltración.
+
+| Técnica | Herramientas | Badge |
+|---------|-------------|-------|
+| **Escalamiento de Privilegios Linux** | LinPEAS, sudo -l, SUID, cron abuse | ![](https://img.shields.io/badge/-PRIVESC-a855f7?style=flat-square) |
+| **Escalamiento de Privilegios Windows** | WinPEAS, token impersonation, UAC bypass | ![](https://img.shields.io/badge/-PRIVESC-a855f7?style=flat-square) |
+| **Movimiento Lateral** | Pass-the-Hash, Pass-the-Ticket, PsExec | ![](https://img.shields.io/badge/-LATERAL-ff3c6e?style=flat-square) |
+| **Persistencia** | Backdoors, cronjobs, tareas programadas | ![](https://img.shields.io/badge/-PERSIST-ff6b00?style=flat-square) |
+| **Exfiltración** | Transferencia de archivos, canales encubiertos | ![](https://img.shields.io/badge/-EXFIL-ffb300?style=flat-square) |
+| **Pivoting** | Proxychains, chisel, SSH tunneling | ![](https://img.shields.io/badge/-PIVOT-00d4ff?style=flat-square) |
+
+> [!NOTE]
+> Contenido en desarrollo. Próximamente disponible.
+
+---
+
+## 🗂️ Resumen de Archivos
+
+| Archivo | Fase | Estado |
+|---------|------|--------|
+| [Reconocimiento/Pasivo.md](Reconocimiento/Pasivo.md) | Recon Pasivo | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
+| [Reconocimiento/Activo.md](Reconocimiento/Activo.md) | Recon Activo / Escaneo | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
+| Explotacion/ | Explotación | ![](https://img.shields.io/badge/-En%20desarrollo-ffb300?style=flat-square) |
+| Post-Explotacion/ | Post-Explotación | ![](https://img.shields.io/badge/-En%20desarrollo-ffb300?style=flat-square) |
+
+---
+
+## 📂 Estructura del Repositorio
 
 ```
 Seg-Ofs/
-├── README.md
-├── Reconocimiento/
-│   ├── Pasivo.md          # OSINT y recon pasivo
-│   └── Activo.md          # Escaneo activo y enumeración
-├── Escaneo/               # (próximamente)
-├── Explotacion/           # (próximamente)
-└── Post-Explotacion/      # (próximamente)
+├── 📄 README.md
+├── 📁 Reconocimiento/
+│   ├── 🕵️  Pasivo.md          # OSINT y recon sin interacción directa
+│   └── 🔴  Activo.md          # Nmap, enum4linux, NetExec, FFUF, SMTP
+├── 📁 Escaneo/                # (próximamente)
+├── 📁 Explotacion/            # (próximamente)
+└── 📁 Post-Explotacion/       # (próximamente)
 ```
-
----
-
-> **Uso educativo y en entornos autorizados únicamente.**
