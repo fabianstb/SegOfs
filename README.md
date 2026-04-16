@@ -140,15 +140,26 @@
 
 ---
 
+## 🏋️ Desafíos — Labs Prácticos
+
+> Escenarios vulnerables para practicar las técnicas documentadas en cada fase.
+
+| Lab | Temática | Servicios | Nivel | Estado |
+|-----|----------|-----------|-------|--------|
+| [⚡ Planta Energía Vulnerable](Desafíos/Planta_Energia/README.md) | ICS / SCADA | FTP, SMB, Web, SSH, TELNET, SMTP | ![](https://img.shields.io/badge/-Intermedio-ffb300?style=flat-square) | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
+
+---
+
 ## 📂 Estructura del Repositorio
 
 ```
 Seg-Ofs/
 ├── 📄 README.md
 ├── 📁 Reconocimiento/
-│   ├── 🕵️  Pasivo.md          # OSINT y recon sin interacción directa
-│   └── 🔴  Activo.md          # Nmap, enum4linux, NetExec, FFUF, SMTP
-├── 📁 Escaneo/                # (próximamente)
-├── 📁 Explotacion/            # (próximamente)
-└── 📁 Post-Explotacion/       # (próximamente)
+│   ├── 🕵️  Pasivo.md              # OSINT y recon sin interacción directa
+│   └── 🔴  Activo.md              # Nmap, enum4linux, NetExec, FFUF, SMTP
+├── 📁 Desafíos/
+│   └── ⚡  Planta_Energia/        # Lab SCADA — FTP, SMB, Web, SSH, TELNET, SMTP
+├── 📁 Explotacion/                # (próximamente)
+└── 📁 Post-Explotacion/           # (próximamente)
 ```
