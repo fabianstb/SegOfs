@@ -91,41 +91,41 @@
 ## 💥 Fase 3 — Explotación
 
 ![Category](https://img.shields.io/badge/Category-Exploitation-ff6b00?style=flat-square&logo=hackthebox&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Próximamente-555555?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Disponible-00ff88?style=flat-square)
 
 > Aprovechamiento de vulnerabilidades identificadas en las fases anteriores para obtener acceso al sistema objetivo.
 
+📄 **[→ Ver Metasploit Framework](Explotación/Metasploit.md)**
+📄 **[→ Ver Hydra — Fuerza Bruta](Explotación/Hydra.md)**
+📄 **[→ Ver Cracking — Hashcat & JTR](Explotación/Cracking.md)**
+
 | Herramienta / Técnica | Enfoque | Badge |
 |-----------------------|---------|-------|
-| **Metasploit Framework** | Explotación automatizada, payloads, msfvenom | ![](https://img.shields.io/badge/-MSF-ff6b00?style=flat-square) |
-| **Exploits manuales** | Buffer overflow, RCE, SQLi, LFI/RFI | ![](https://img.shields.io/badge/-MANUAL-ff3c6e?style=flat-square) |
-| **SQLmap** | Inyección SQL automatizada | ![](https://img.shields.io/badge/-SQLi-ffb300?style=flat-square) |
-| **Hydra / Medusa** | Ataques de fuerza bruta a servicios | ![](https://img.shields.io/badge/-BRUTE-ff3c6e?style=flat-square) |
-| **Burp Suite** | Interceptación y explotación web | ![](https://img.shields.io/badge/-WEB-00d4ff?style=flat-square) |
-
-> [!NOTE]
-> Contenido en desarrollo. Próximamente disponible.
+| **Metasploit Framework** | Exploits, msfvenom, meterpreter, post-explot | ![](https://img.shields.io/badge/-MSF-ff6b00?style=flat-square) |
+| **Hydra** | Fuerza bruta SSH, FTP, HTTP, RDP, SMB, SMTP | ![](https://img.shields.io/badge/-BRUTE-ff3c6e?style=flat-square) |
+| **Hashcat** | Cracking GPU — NTLM, NetNTLM, WPA2, Kerberoast | ![](https://img.shields.io/badge/-CRACK-a855f7?style=flat-square) |
+| **John the Ripper** | Cracking CPU — archivos ZIP/PDF/SSH/KeePass | ![](https://img.shields.io/badge/-CRACK-a855f7?style=flat-square) |
+| **Reverse Shells** | Bash, Python, PHP, nc, socat, msfvenom | ![](https://img.shields.io/badge/-SHELL-00d4ff?style=flat-square) |
 
 ---
 
 ## ⬆️ Fase 4 — Post-Explotación
 
 ![Category](https://img.shields.io/badge/Category-Post--Exploitation-a855f7?style=flat-square&logo=hackthebox&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Próximamente-555555?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Disponible-00ff88?style=flat-square)
 
 > Acciones tras el acceso inicial: escalamiento de privilegios, movimiento lateral, persistencia y exfiltración.
 
+📄 **[→ Ver Escalamiento de Privilegios](Explotación/Privesc.md)**
+
 | Técnica | Herramientas | Badge |
 |---------|-------------|-------|
-| **Escalamiento de Privilegios Linux** | LinPEAS, sudo -l, SUID, cron abuse | ![](https://img.shields.io/badge/-PRIVESC-a855f7?style=flat-square) |
-| **Escalamiento de Privilegios Windows** | WinPEAS, token impersonation, UAC bypass | ![](https://img.shields.io/badge/-PRIVESC-a855f7?style=flat-square) |
+| **Escalamiento Linux** | LinPEAS, sudo -l, SUID, cron, GTFOBins | ![](https://img.shields.io/badge/-PRIVESC-a855f7?style=flat-square) |
+| **Escalamiento Windows** | WinPEAS, PowerUp, token impersonation, UAC bypass | ![](https://img.shields.io/badge/-PRIVESC-a855f7?style=flat-square) |
 | **Movimiento Lateral** | Pass-the-Hash, Pass-the-Ticket, PsExec | ![](https://img.shields.io/badge/-LATERAL-ff3c6e?style=flat-square) |
 | **Persistencia** | Backdoors, cronjobs, tareas programadas | ![](https://img.shields.io/badge/-PERSIST-ff6b00?style=flat-square) |
 | **Exfiltración** | Transferencia de archivos, canales encubiertos | ![](https://img.shields.io/badge/-EXFIL-ffb300?style=flat-square) |
 | **Pivoting** | Proxychains, chisel, SSH tunneling | ![](https://img.shields.io/badge/-PIVOT-00d4ff?style=flat-square) |
-
-> [!NOTE]
-> Contenido en desarrollo. Próximamente disponible.
 
 ---
 
@@ -135,8 +135,11 @@
 |---------|------|--------|
 | [Reconocimiento/Pasivo.md](Reconocimiento/Pasivo.md) | Recon Pasivo | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
 | [Reconocimiento/Activo.md](Reconocimiento/Activo.md) | Recon Activo / Escaneo | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
-| Explotacion/ | Explotación | ![](https://img.shields.io/badge/-En%20desarrollo-ffb300?style=flat-square) |
-| Post-Explotacion/ | Post-Explotación | ![](https://img.shields.io/badge/-En%20desarrollo-ffb300?style=flat-square) |
+| [Explotación/Metasploit.md](Explotación/Metasploit.md) | Metasploit + Reverse Shells | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
+| [Explotación/Hydra.md](Explotación/Hydra.md) | Fuerza Bruta — Hydra | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
+| [Explotación/Cracking.md](Explotación/Cracking.md) | Hashcat & John the Ripper | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
+| [Explotación/Privesc.md](Explotación/Privesc.md) | Escalamiento Linux & Windows | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
+| Post-Explotacion/ | Persistencia / Pivoting | ![](https://img.shields.io/badge/-En%20desarrollo-ffb300?style=flat-square) |
 
 ---
 
@@ -158,8 +161,12 @@ Seg-Ofs/
 ├── 📁 Reconocimiento/
 │   ├── 🕵️  Pasivo.md              # OSINT y recon sin interacción directa
 │   └── 🔴  Activo.md              # Nmap, enum4linux, NetExec, FFUF, SMTP
+├── 📁 Explotación/
+│   ├── 💣  Metasploit.md          # MSF, msfvenom, meterpreter, reverse shells
+│   ├── 💧  Hydra.md               # Fuerza bruta — 50+ protocolos
+│   ├── 🔓  Cracking.md            # Hashcat & John the Ripper
+│   └── ⬆️  Privesc.md             # Escalamiento Linux & Windows
 ├── 📁 Desafíos/
 │   └── ⚡  Planta_Energia/        # Lab SCADA — FTP, SMB, Web, SSH, TELNET, SMTP
-├── 📁 Explotacion/                # (próximamente)
 └── 📁 Post-Explotacion/           # (próximamente)
 ```
