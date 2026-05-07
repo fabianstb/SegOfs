@@ -72,6 +72,27 @@ bypassSecurityTrustHtml(e)     ← sanitización DESHABILITADA
 JavaScript ejecutado en navegador
 ```
 
+### `[03]` Explicación del Flujo (Paso a Paso)
+
+Este flujo es una "crónica de una vulnerabilidad anunciada":
+
+- La Entrada (SOURCE):
+  El atacante envía una URL que contiene el payload en el parámetro `q`. Como es un DOM-based XSS, el valor después del `?` o del `#` es leído directamente por el código JavaScript que corre en el cliente, no necesariamente por el servidor.
+
+- La Captura:
+  `route.snapshot.queryParams.q` toma ese texto directamente de la barra de direcciones y lo guarda en una variable. En este punto, el payload es solo una cadena de texto "inofensiva".
+
+- El Error Fatal (Bypass):
+  `bypassSecurityTrustHtml(e)` es una función de Angular diseñada específicamente para decir: "Confío en este contenido, no lo limpies".
+
+  Concepto clave: Normalmente, los frameworks modernos "escapan" el código (convierten `<` en `&lt;`) para que no se ejecute. Al usar esta función, el programador está abriendo la puerta y quitando el "escudo" de seguridad.
+
+- La Ejecución (SINK):
+  `[innerHTML binding]` es el punto de impacto. El framework toma el código que acabamos de marcar como "confiable" y lo inserta en el DOM de la página.
+
+- Resultado:
+  El navegador ve un nuevo elemento `<iframe>` en el documento, intenta procesar su atributo `src`, reconoce el protocolo de JavaScript y ejecuta el `alert`.
+
 ---
 
 ## 🧪 Reproducción
