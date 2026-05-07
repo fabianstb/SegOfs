@@ -105,6 +105,21 @@
 
 ---
 
+## 🧪 Labs Verificados — Juice Shop
+
+| # | Hallazgo | Severidad | Writeup |
+|---|----------|-----------|---------|
+| 01 | SQL Injection — Login Admin | ![](https://img.shields.io/badge/-Crítica-d32f2f?style=flat-square) | [Juice_Shop/SQLi_Login_Admin.md](Juice_Shop/SQLi_Login_Admin.md) |
+| 02 | DOM XSS — Búsqueda | ![](https://img.shields.io/badge/-Alta-ff6b00?style=flat-square) | [Juice_Shop/DOM_XSS.md](Juice_Shop/DOM_XSS.md) |
+| 03 | SSRF — Imagen de Perfil | ![](https://img.shields.io/badge/-Alta-ff6b00?style=flat-square) | [Juice_Shop/SSRF_Profile_Image_URL.md](Juice_Shop/SSRF_Profile_Image_URL.md) |
+| 04 | CSRF — Cambio de Perfil | ![](https://img.shields.io/badge/-Media-ffb300?style=flat-square) | [Juice_Shop/CSRF_Profile.md](Juice_Shop/CSRF_Profile.md) |
+| 05 | File Upload — Bypass Tipo/Tamaño | ![](https://img.shields.io/badge/-Media-ffb300?style=flat-square) | [Juice_Shop/File_Upload_Bypass.md](Juice_Shop/File_Upload_Bypass.md) |
+| 06 | Poison Null Byte — Path Traversal | ![](https://img.shields.io/badge/-Media-ffb300?style=flat-square) | [Juice_Shop/Poison_Null_Byte.md](Juice_Shop/Poison_Null_Byte.md) |
+
+📄 **[→ Ver índice completo Juice Shop](Juice_Shop/README.md)**
+
+---
+
 ## 🧱 Orden Sugerido
 
 1. `CAIDO.md` — setup y flujo base

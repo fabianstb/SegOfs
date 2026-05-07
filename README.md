@@ -177,7 +177,14 @@ Seg-Ofs/
 │       ├── 📡  SSRF.md            # Server-side Request Forgery
 │       ├── 📁  Path_Traversal.md  # Path Traversal
 │       ├── 💻  Command_Injection.md  # Command Injection
-│       └── 📤  File_Upload.md     # File Upload bypass
+│       ├── 📤  File_Upload.md     # File Upload bypass
+│       └── 📁 Juice_Shop/         # Writeups verificados OWASP Juice Shop
+│           ├── SQLi_Login_Admin.md
+│           ├── DOM_XSS.md
+│           ├── CSRF_Profile.md
+│           ├── SSRF_Profile_Image_URL.md
+│           ├── File_Upload_Bypass.md
+│           └── Poison_Null_Byte.md
 ├── 📁 Desafíos/
 │   └── ⚡  Planta_Energia/        # Lab SCADA — FTP, SMB, Web, SSH, TELNET, SMTP
 └── 📁 Post-Explotacion/           # (próximamente)
