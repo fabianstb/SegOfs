@@ -14,7 +14,7 @@
 > **Objetivo:** guía práctica de hacking web basada en entornos controlados. Temario alineado con laboratorios de **DVWA**, **OWASP Juice Shop** y **PortSwigger Web Security Academy**.
 
 > [!WARNING]
-> **Uso exclusivo en laboratorio.** Todo contenido de esta carpeta asume práctica en entornos propios, deliberadamente vulnerables o con autorización explícita.
+> **Aviso Legal y Ético:** Todo contenido de esta carpeta asume práctica en entornos propios, deliberadamente vulnerables o con **autorización explícita por escrito (RoE).** El uso no autorizado constituye un delito penal.
 
 ---
 
@@ -37,7 +37,7 @@
 
 | Entorno | Uso | Notas |
 |---------|-----|-------|
-| **DVWA** | Vulnerabilidades clásicas web | Ideal para SQLi, XSS, CSRF, command injection, file upload |
+| **DVWA** | Vulnerabilidades clásicas web | Ideal para SQLi, XSS, CSRF, Command Injection, File Upload |
 | **OWASP Juice Shop** | App moderna SPA/API | Ideal para XSS, auth, access control, SSRF, API abuse |
 | **PortSwigger Web Security Academy** | Labs guiados por vulnerabilidad | Ideal para profundizar técnica y variantes reales |
 
@@ -47,33 +47,47 @@
 
 ### Principal
 
-| Herramienta | Uso |
-|-------------|-----|
-| **Caido** | Proxy, intercept, replay, fuzzing, filtros, match/replace, análisis HTTP |
+| Herramienta | Uso | Badge |
+|-------------|-----|-------|
+| **Caido** | Proxy, intercept, replay, fuzzing, filtros, match/replace, análisis HTTP | ![](https://img.shields.io/badge/-Proxy-00ff88?style=flat-square) |
 
 ### Complementarias
 
-| Herramienta | Uso |
-|-------------|-----|
-| **Firefox + DevTools** | DOM, CSP, storage, JS, eventos |
-| **ffuf** | Descubrimiento de rutas, parámetros y vhosts |
-| **sqlmap** | Confirmación y automatización de SQLi en labs |
-| **dalfox** | Apoyo para XSS reflejado/DOM |
-| **interactsh-client** | OAST para SSRF ciego y callbacks |
-| **jq** | Parseo de JSON/API responses |
-| **curl** | Reproducción rápida fuera de proxy |
+| Herramienta | Uso | Badge |
+|-------------|-----|-------|
+| **Firefox + DevTools** | DOM, CSP, storage, JS, eventos | ![](https://img.shields.io/badge/-Browser-5865f2?style=flat-square) |
+| **ffuf** | Descubrimiento de rutas, parámetros y vhosts | ![](https://img.shields.io/badge/-Fuzz-ff6b00?style=flat-square) |
+| **sqlmap** | Confirmación y automatización de SQLi en labs | ![](https://img.shields.io/badge/-SQLi-ff3c6e?style=flat-square) |
+| **dalfox** | Apoyo para XSS reflejado/DOM | ![](https://img.shields.io/badge/-XSS-00d4ff?style=flat-square) |
+| **interactsh-client** | OAST para SSRF ciego y callbacks | ![](https://img.shields.io/badge/-OAST-a855f7?style=flat-square) |
+| **jq** | Parseo de JSON/API responses | ![](https://img.shields.io/badge/-JSON-ffb300?style=flat-square) |
+| **curl** | Reproducción rápida fuera de proxy | ![](https://img.shields.io/badge/-HTTP-00d4ff?style=flat-square) |
 
 ---
 
 ## 🎯 Flujo Recomendado
 
+### `[01]` Reconocimiento
+
 1. Definir alcance en Caido con `Scopes`.
 2. Navegar app y capturar tráfico en `HTTP History`.
-3. Mandar requests útiles a `Replay`.
-4. Probar variaciones manuales.
-5. Escalar a `Automate` si hace falta fuzzing o wordlists.
-6. Documentar payload válido, precondiciones, respuesta esperada e impacto.
-7. Repetir solo en labs controlados.
+
+### `[02]` Identificación
+
+3. Localizar parámetros controlados, acciones sensibles y sinks.
+4. Mandar requests útiles a `Replay`.
+
+### `[03]` Explotación
+
+5. Probar variaciones manuales por contexto.
+6. Escalar a `Automate` si hace falta fuzzing o wordlists.
+
+### `[04]` Documentación
+
+7. Guardar: payload válido, precondiciones, respuesta esperada e impacto.
+
+> [!IMPORTANT]
+> Repetir solo en labs controlados. Cada técnica tiene archivo propio con payloads, flujo y checklist.
 
 ---
 
@@ -93,19 +107,20 @@
 
 ## 🧱 Orden Sugerido
 
-1. `SQLi.md`
-2. `XSS.md`
-3. `CSRF.md`
-4. `Path_Traversal.md`
-5. `Command_Injection.md`
-6. `File_Upload.md`
-7. `SSRF.md`
+1. `CAIDO.md` — setup y flujo base
+2. `SQLi.md`
+3. `XSS.md`
+4. `CSRF.md`
+5. `Path_Traversal.md`
+6. `Command_Injection.md`
+7. `File_Upload.md`
+8. `SSRF.md`
 
 ---
 
 ## 🔗 Referencias
 
-- Hack4u, curso **Hacking Web**
-- PortSwigger Web Security Academy
-- Caido Documentation
-- OWASP Juice Shop
+- [PortSwigger Web Security Academy](https://portswigger.net/web-security)
+- [OWASP Juice Shop](https://owasp.org/www-project-juice-shop/)
+- [DVWA](https://github.com/digininja/DVWA)
+- [Caido Documentation](https://docs.caido.io)

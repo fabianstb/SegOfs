@@ -98,6 +98,7 @@
 📄 **[→ Ver Metasploit Framework](Explotación/Metasploit.md)**
 📄 **[→ Ver Hydra — Fuerza Bruta](Explotación/Hydra.md)**
 📄 **[→ Ver Cracking — Hashcat & JTR](Explotación/Cracking.md)**
+📄 **[→ Ver Hacking Web — SQLi, XSS, CSRF, SSRF y más](Explotación/Hacking_Web/README.md)**
 
 | Herramienta / Técnica | Enfoque | Badge |
 |-----------------------|---------|-------|
@@ -106,6 +107,7 @@
 | **Hashcat** | Cracking GPU — NTLM, NetNTLM, WPA2, Kerberoast | ![](https://img.shields.io/badge/-CRACK-a855f7?style=flat-square) |
 | **John the Ripper** | Cracking CPU — archivos ZIP/PDF/SSH/KeePass | ![](https://img.shields.io/badge/-CRACK-a855f7?style=flat-square) |
 | **Reverse Shells** | Bash, Python, PHP, nc, socat, msfvenom | ![](https://img.shields.io/badge/-SHELL-00d4ff?style=flat-square) |
+| **Hacking Web** | SQLi, XSS, CSRF, SSRF, Path Traversal, CMDi, File Upload | ![](https://img.shields.io/badge/-WEB-00d4ff?style=flat-square) |
 
 ---
 
@@ -139,6 +141,7 @@
 | [Explotación/Hydra.md](Explotación/Hydra.md) | Fuerza Bruta — Hydra | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
 | [Explotación/Cracking.md](Explotación/Cracking.md) | Hashcat & John the Ripper | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
 | [Explotación/Privesc.md](Explotación/Privesc.md) | Escalamiento Linux & Windows | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
+| [Explotación/Hacking_Web/](Explotación/Hacking_Web/README.md) | Web — SQLi, XSS, CSRF, SSRF, Path Traversal, CMDi, File Upload | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
 | Post-Explotacion/ | Persistencia / Pivoting | ![](https://img.shields.io/badge/-En%20desarrollo-ffb300?style=flat-square) |
 
 ---
@@ -165,7 +168,16 @@ Seg-Ofs/
 │   ├── 💣  Metasploit.md          # MSF, msfvenom, meterpreter, reverse shells
 │   ├── 💧  Hydra.md               # Fuerza bruta — 50+ protocolos
 │   ├── 🔓  Cracking.md            # Hashcat & John the Ripper
-│   └── ⬆️  Privesc.md             # Escalamiento Linux & Windows
+│   ├── ⬆️  Privesc.md             # Escalamiento Linux & Windows
+│   └── 📁 Hacking_Web/            # Hacking Web — SQLi, XSS, CSRF, SSRF, más
+│       ├── 🧪  CAIDO.md           # Flujo base con Caido
+│       ├── 💉  SQLi.md            # SQL Injection
+│       ├── 🧨  XSS.md             # Cross-site Scripting
+│       ├── 🔁  CSRF.md            # Cross-site Request Forgery
+│       ├── 📡  SSRF.md            # Server-side Request Forgery
+│       ├── 📁  Path_Traversal.md  # Path Traversal
+│       ├── 💻  Command_Injection.md  # Command Injection
+│       └── 📤  File_Upload.md     # File Upload bypass
 ├── 📁 Desafíos/
 │   └── ⚡  Planta_Energia/        # Lab SCADA — FTP, SMB, Web, SSH, TELNET, SMTP
 └── 📁 Post-Explotacion/           # (próximamente)

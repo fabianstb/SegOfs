@@ -1,17 +1,41 @@
 <div align="center">
 
 # 🧪 Caido
-### Flujo Base para Labs de Hacking Web
+### Proxy Principal — Flujo Base para Labs de Hacking Web
+
+![Status](https://img.shields.io/badge/Status-Active-ff3c6e?style=for-the-badge&logo=statuspage&logoColor=white)
+![Category](https://img.shields.io/badge/Category-Web%20Proxy-00d4ff?style=for-the-badge&logo=owasp&logoColor=white)
+![Tool](https://img.shields.io/badge/Tool-Caido-00ff88?style=for-the-badge)
 
 </div>
 
 ---
 
-> **Idea:** usar `Caido` como herramienta principal. Todo request pasa por proxy, luego análisis manual en `HTTP History`, `Replay` y `Automate`.
+> **Objetivo:** usar Caido como proxy principal en todos los labs. Todo request pasa por proxy, luego análisis manual en `HTTP History`, `Replay` y `Automate`.
+
+> [!WARNING]
+> **Aviso Legal y Ético:** Uso exclusivo en entornos con **autorización explícita por escrito (RoE).** El uso no autorizado constituye un delito penal.
+
+---
+
+## 📑 Tabla de Contenidos
+
+| # | Sección |
+|---|---------|
+| 01 | [🗂️ Componentes Clave](#️-componentes-clave) |
+| 02 | [🚀 Setup Mínimo](#-setup-mínimo) |
+| 03 | [🔁 Workflow](#-workflow) |
+| 04 | [🧵 Casos de Uso por Feature](#-casos-de-uso-por-feature) |
+| 05 | [🔍 Queries HTTPQL](#-queries-httpql) |
+| 06 | [🧰 Wordlists](#-wordlists) |
+| 07 | [🧪 Atajos de Laboratorio](#-atajos-de-laboratorio) |
+| 08 | [📝 Evidencia Mínima](#-evidencia-mínima) |
 
 ---
 
 ## 🗂️ Componentes Clave
+
+![Tool](https://img.shields.io/badge/Tool-Caido-00ff88?style=flat-square)
 
 | Función | Uso práctico |
 |---------|--------------|
@@ -28,7 +52,11 @@
 
 ## 🚀 Setup Mínimo
 
-1. Crear proyecto nuevo.
+![Tool](https://img.shields.io/badge/Setup-Inicial-00d4ff?style=flat-square)
+
+### `[01]` Configuración inicial
+
+1. Crear proyecto nuevo en Caido.
 2. Importar certificado CA de Caido en navegador de laboratorio.
 3. Definir scope por host:
    - `dvwa.local`
@@ -36,9 +64,14 @@
    - subdominio/lab de PortSwigger
 4. Navegar app desde navegador proxied.
 
+> [!TIP]
+> Configurar scope desde el inicio. Sin scope, `HTTP History` se llena de tráfico irrelevante y dificulta el análisis.
+
 ---
 
-## 🔁 Workflow Corto
+## 🔁 Workflow
+
+![Tool](https://img.shields.io/badge/Workflow-Estándar-ff6b00?style=flat-square)
 
 ### `[01]` Captura
 
@@ -48,69 +81,82 @@
 
 ### `[02]` Aislar
 
-- Filtrar por:
-  - método `POST`
-  - status `200/302/500`
-  - endpoints tipo `login`, `search`, `comment`, `upload`, `stock`, `api`
+Filtrar por:
+
+- método `POST`
+- status `200/302/500`
+- endpoints tipo `login`, `search`, `comment`, `upload`, `stock`, `api`
 
 ### `[03]` Repetir
 
-- `Send to Replay`
-- cambiar 1 cosa por vez:
-  - parámetro
-  - header
-  - cookie
-  - método HTTP
-  - content-type
+`Send to Replay`, cambiar 1 cosa por vez:
+
+- parámetro
+- header
+- cookie
+- método HTTP
+- content-type
 
 ### `[04]` Escalar
 
-- Si ya hay vector:
-  - `Send to Automate`
-  - meter placeholder
-  - cargar wordlist o lista manual
+Si ya hay vector confirmado:
+
+- `Send to Automate`
+- meter placeholder en el parámetro
+- cargar wordlist o lista manual
+
+> [!IMPORTANT]
+> Cambiar una variable por vez. Cambiar múltiples simultáneamente oscurece cuál fue efectiva.
 
 ---
 
 ## 🧵 Casos de Uso por Feature
 
+![Tool](https://img.shields.io/badge/Feature-Reference-a855f7?style=flat-square)
+
 ### HTTP History
 
-- Encontrar:
-  - parámetros repetidos
-  - responses largas/cortas
-  - errores `500`
-  - redirecciones raras
+Buscar:
+
+- parámetros repetidos
+- responses largas/cortas
+- errores `500`
+- redirecciones raras
 
 ### Replay
 
-- Ideal para:
-  - SQLi manual
-  - XSS reflejado
-  - CSRF token testing
-  - path traversal
-  - SSRF puntual
+Ideal para:
+
+- SQLi manual
+- XSS reflejado
+- CSRF token testing
+- path traversal
+- SSRF puntual
 
 ### Automate
 
-- Ideal para:
-  - columnas SQLi con `ORDER BY`
-  - wordlists XSS
-  - usernames/IDs
-  - fuzz de rutas y parámetros
-  - bypass de filtros con variantes encoding
+Ideal para:
+
+- columnas SQLi con `ORDER BY`
+- wordlists XSS
+- usernames/IDs
+- fuzz de rutas y parámetros
+- bypass de filtros con variantes encoding
 
 ### Match & Replace
 
-- Ideal para:
-  - añadir header fijo
-  - sustituir cookie
-  - reescribir host
-  - URL-encode automático
+Ideal para:
+
+- añadir header fijo a todos los requests
+- sustituir cookie automáticamente
+- reescribir host
+- URL-encode automático
 
 ---
 
-## 🔍 Queries Útiles
+## 🔍 Queries HTTPQL
+
+![Tool](https://img.shields.io/badge/HTTPQL-Query%20Language-00d4ff?style=flat-square)
 
 ```text
 method:POST
@@ -120,26 +166,34 @@ path:/login
 content_type:json
 ```
 
-Usar combinaciones:
+Combinaciones:
 
 ```text
 method:POST AND status_code:200
 host:juice-shop AND path:/rest
 ```
 
+> [!TIP]
+> Guardar queries frecuentes como favoritos en Caido para reutilizarlos entre labs.
+
 ---
 
-## 🧰 Wordlists / Payload Sets
+## 🧰 Wordlists
+
+![Tool](https://img.shields.io/badge/Automate-Wordlists-ff3c6e?style=flat-square)
 
 Preparar archivos para `Automate`:
 
-- `sqli-basic.txt`
-- `xss-basic.txt`
-- `traversal.txt`
-- `cmdi-basic.txt`
-- `ssrf-hosts.txt`
+| Archivo | Uso |
+|---------|-----|
+| `sqli-basic.txt` | Payloads SQLi mínimos |
+| `xss-basic.txt` | Payloads XSS por contexto |
+| `traversal.txt` | Secuencias path traversal |
+| `cmdi-basic.txt` | Separadores command injection |
+| `ssrf-hosts.txt` | Hosts internos / loopback |
 
-Payloads chicos primero. Luego variantes encoded.
+> [!NOTE]
+> Usar listas pequeñas primero. Variantes encoded como segunda pasada.
 
 ---
 
@@ -148,16 +202,16 @@ Payloads chicos primero. Luego variantes encoded.
 | Hallazgo | Siguiente paso en Caido |
 |----------|-------------------------|
 | Parámetro refleja input | `Replay` con payload XSS |
-| Error SQL o cambio lógico | `Replay` + `Automate` |
+| Error SQL o cambio lógico | `Replay` → `Automate` |
 | Recurso carga URL externa | `Replay` con payload SSRF |
 | File path controlado | `Replay` con traversal list |
-| Acción sensible POST | revisar token, origin, referer, SameSite |
+| Acción sensible POST sin token | revisar `Origin`, `Referer`, `SameSite` |
 
 ---
 
 ## 📝 Evidencia Mínima
 
-Guardar por cada hallazgo:
+Por cada hallazgo guardar en Caido:
 
 1. Request original.
 2. Request modificado.
@@ -170,5 +224,6 @@ Guardar por cada hallazgo:
 
 ## 🔗 Referencias
 
-- Caido docs: `HTTP History`, `Replay`, `Automate`, `Match & Replace`, `Scopes`
-- Caido docs: `Assistant` y `Generating CSRF PoCs`
+- [Caido Documentation](https://docs.caido.io)
+- Caido features: `HTTP History`, `Replay`, `Automate`, `Match & Replace`, `Scopes`
+- Caido features: `Assistant` y `Generating CSRF PoCs`
