@@ -37,11 +37,11 @@
 │                    CICLO DE PENTESTING                          │
 │                                                                 │
 │   🕵️ RECON        🔭 ESCANEO      💥 EXPLOTACIÓN               │
-│   PASIVO    ──►   ACTIVO    ──►   & ACCESO      ──►  ...       │
+│   PASIVO    ──►   ACTIVO    ──►   & ACCESO      ──►  ...        │
 │   (OSINT)         (Nmap/CME)      (Metasploit)                  │
 │                                                                 │
-│   ⬆️ ESCALAMIENTO  ↔️ MOV. LATERAL   🔒 PERSISTENCIA            │
-│   ... ──►  PRIVESC   ──►  PTH/PTT   ──►  BACKDOOR              │
+│   ⬆️ ESCALAMIENTO  ↔️ MOV. LATERAL   🔒 PERSISTENCIA          │
+│   ... ──►  PRIVESC   ──►  PTH/PTT   ──►  BACKDOOR               │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
