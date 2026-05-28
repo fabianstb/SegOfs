@@ -153,6 +153,7 @@
 | Lab | Temática | Servicios | Nivel | Estado |
 |-----|----------|-----------|-------|--------|
 | [⚡ Planta Energía Vulnerable](Desafíos/Planta_Energia/README.md) | ICS / SCADA | FTP, SMB, Web, SSH, TELNET, SMTP | ![](https://img.shields.io/badge/-Intermedio-ffb300?style=flat-square) | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
+| [💧 Aguas Sur S.A.](Desafíos/aguas_sur/writeup.md) | Web · Post-Explot | HTTP, SSH, FTP, SMTP, SMB | ![](https://img.shields.io/badge/-Medio-ffb300?style=flat-square) | ![](https://img.shields.io/badge/-Disponible-00ff88?style=flat-square) |
 
 ---
 
@@ -186,6 +187,7 @@ Seg-Ofs/
 │           ├── File_Upload_Bypass.md
 │           └── Poison_Null_Byte.md
 ├── 📁 Desafíos/
-│   └── ⚡  Planta_Energia/        # Lab SCADA — FTP, SMB, Web, SSH, TELNET, SMTP
+│   ├── ⚡  Planta_Energia/        # Lab SCADA — FTP, SMB, Web, SSH, TELNET, SMTP
+│   └── 💧  aguas_sur/             # Lab CTF — Web, SQLi, JWT, File Upload, Lateral Movement
 └── 📁 Post-Explotacion/           # (próximamente)
 ```
